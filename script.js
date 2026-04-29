@@ -1,98 +1,22 @@
-const business = {
-  name: "Bar El Rincón",
-  slug: "barelrincón",
-  ownerInitials: "JM",
-  targetMargin: 0.75,
-  languages: ["ES", "EN", "FR", "DE"],
-};
+let business = { name: "Bar El Rincón", slug: "barelrincón", ownerInitials: "JM", targetMargin: 0.75, languages: ["ES", "EN", "FR", "DE"] };
+let ingredients = {};
+let dishes = [];
+let selectedDishId = "";
+let supabase = null;
+let session = null;
+let businessId = null;
+let useSupabase = false;
 
-const ingredients = {
-  potato: { name: "Patatas", unit: "g", before: 0.00065, current: 0.00065 },
-  egg: { name: "Huevos", unit: "uds", before: 0.23, current: 0.23 },
-  oil: { name: "Aceite de oliva", unit: "ml", before: 0.0058, current: 0.00684 },
-  onion: { name: "Cebolla", unit: "g", before: 0.0008, current: 0.0008 },
-  salt: { name: "Sal", unit: "receta", before: 0.01, current: 0.01 },
-  prawn: { name: "Gambas", unit: "g", before: 0.028, current: 0.028 },
-  garlic: { name: "Ajo", unit: "g", before: 0.004, current: 0.004 },
-  lettuce: { name: "Lechuga", unit: "g", before: 0.003, current: 0.003 },
-  tuna: { name: "Atún", unit: "g", before: 0.011, current: 0.011 },
-  ham: { name: "Jamón", unit: "g", before: 0.012, current: 0.012 },
-  milk: { name: "Leche", unit: "ml", before: 0.00124, current: 0.00124 },
-  flour: { name: "Harina", unit: "g", before: 0.0016, current: 0.0016 },
-};
-
-let dishes = [
-  {
-    id: "tortilla",
-    name: "Tortilla de patatas",
-    category: "Tapas",
-    servings: 1,
-    pvp: 3,
-    icon: "egg",
-    published: true,
-    description: "Jugosa tortilla casera con patata pochada y huevo de corral.",
-    allergens: "Contiene huevo",
-    recipe: [
-      { ingredient: "potato", qty: 200 },
-      { ingredient: "egg", qty: 1.5 },
-      { ingredient: "oil", qty: 20 },
-      { ingredient: "onion", qty: 50 },
-      { ingredient: "salt", qty: 1 },
-    ],
-  },
-  {
-    id: "gambas",
-    name: "Gambas al ajillo",
-    category: "Tapas",
-    servings: 1,
-    pvp: 7.5,
-    icon: "prawn",
-    published: true,
-    description: "Gambas salteadas con ajo, aceite de oliva y un punto de guindilla.",
-    allergens: "Marisco",
-    recipe: [
-      { ingredient: "prawn", qty: 180 },
-      { ingredient: "garlic", qty: 12 },
-      { ingredient: "oil", qty: 35 },
-    ],
-  },
-  {
-    id: "ensalada",
-    name: "Ensalada mixta",
-    category: "Tapas",
-    servings: 1,
-    pvp: 5,
-    icon: "olive-thumb",
-    published: true,
-    description: "Lechuga fresca, tomate, cebolla, aceitunas y atún.",
-    allergens: "Disponible hoy",
-    recipe: [
-      { ingredient: "lettuce", qty: 180 },
-      { ingredient: "tuna", qty: 95 },
-      { ingredient: "oil", qty: 22 },
-      { ingredient: "onion", qty: 40 },
-    ],
-  },
-  {
-    id: "croquetas",
-    name: "Croquetas de jamón",
-    category: "Tapas",
-    servings: 6,
-    pvp: 3,
-    icon: "prawn",
-    published: false,
-    description: "",
-    allergens: "Contiene gluten y leche",
-    recipe: [
-      { ingredient: "ham", qty: 80 },
-      { ingredient: "milk", qty: 250 },
-      { ingredient: "flour", qty: 80 },
-      { ingredient: "oil", qty: 28 },
-    ],
-  },
+const ingredientSeed = [
+  ["Patatas", "g", 0.00065, 0.00065], ["Huevos", "uds", 0.23, 0.23], ["Aceite de oliva", "ml", 0.00684, 0.0058], ["Cebolla", "g", 0.0008, 0.0008], ["Sal", "receta", 0.01, 0.01], ["Gambas", "g", 0.028, 0.028], ["Ajo", "g", 0.004, 0.004], ["Lechuga", "g", 0.003, 0.003], ["Atún", "g", 0.011, 0.011], ["Jamón", "g", 0.012, 0.012], ["Leche", "ml", 0.00124, 0.00124], ["Harina", "g", 0.0016, 0.0016]
 ];
 
-let selectedDishId = "tortilla";
+const dishSeed = [
+  { name: "Tortilla de patatas", category: "Tapas", servings: 1, pvp: 3, icon: "egg", published: true, description: "Jugosa tortilla casera con patata pochada y huevo de corral.", allergens: "Contiene huevo", recipe: [["Patatas", 200], ["Huevos", 1.5], ["Aceite de oliva", 20], ["Cebolla", 50], ["Sal", 1]] },
+  { name: "Gambas al ajillo", category: "Tapas", servings: 1, pvp: 7.5, icon: "prawn", published: true, description: "Gambas salteadas con ajo, aceite de oliva y un punto de guindilla.", allergens: "Marisco", recipe: [["Gambas", 180], ["Ajo", 12], ["Aceite de oliva", 35]] },
+  { name: "Ensalada mixta", category: "Tapas", servings: 1, pvp: 5, icon: "olive-thumb", published: true, description: "Lechuga fresca, tomate, cebolla, aceitunas y atún.", allergens: "Disponible hoy", recipe: [["Lechuga", 180], ["Atún", 95], ["Aceite de oliva", 22], ["Cebolla", 40]] },
+  { name: "Croquetas de jamón", category: "Tapas", servings: 6, pvp: 3, icon: "prawn", published: false, description: "", allergens: "Contiene gluten y leche", recipe: [["Jamón", 80], ["Leche", 250], ["Harina", 80], ["Aceite de oliva", 28]] }
+];
 
 const screens = [...document.querySelectorAll(".app-screen")];
 const navButtons = [...document.querySelectorAll(".bottom-nav button")];
@@ -100,115 +24,176 @@ const nav = document.querySelector(".bottom-nav");
 const fab = document.querySelector(".fab");
 const shell = document.querySelector(".phone-shell");
 
-function currency(value) {
-  return `${value.toFixed(2).replace(".", ",")}€`;
-}
-
-function percent(value) {
-  return `${Math.round(value * 100)}%`;
-}
-
-function ingredientCost(line, mode = "current") {
-  return ingredients[line.ingredient][mode] * line.qty;
-}
-
-function dishCost(dish, mode = "current") {
-  return dish.recipe.reduce((total, line) => total + ingredientCost(line, mode), 0);
-}
-
-function dishMargin(dish, mode = "current") {
-  return (dish.pvp - dishCost(dish, mode)) / dish.pvp;
-}
-
-function suggestedPrice(dish, target = business.targetMargin) {
-  return Math.ceil((dishCost(dish) / (1 - target)) * 20) / 20;
-}
-
-function marginClass(margin) {
-  if (margin >= 0.7) return "good-bg";
-  if (margin >= 0.62) return "mid-bg";
-  return "low-bg";
-}
-
-function selectedDish() {
-  return dishes.find((dish) => dish.id === selectedDishId) || dishes[0];
-}
-
+function currency(value) { return `${Number(value || 0).toFixed(2).replace(".", ",")}€`; }
+function percent(value) { return `${Math.round((value || 0) * 100)}%`; }
+function slugify(value) { return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+function ingredientCost(line, mode = "current") { return (ingredients[line.ingredient]?.[mode] || 0) * line.qty; }
+function dishCost(dish, mode = "current") { return dish.recipe.reduce((total, line) => total + ingredientCost(line, mode), 0); }
+function dishMargin(dish, mode = "current") { return dish.pvp > 0 ? (dish.pvp - dishCost(dish, mode)) / dish.pvp : 0; }
+function suggestedPrice(dish, target = business.targetMargin) { return Math.ceil((dishCost(dish) / (1 - target)) * 20) / 20; }
+function marginClass(margin) { if (margin >= 0.7) return "good-bg"; if (margin >= 0.62) return "mid-bg"; return "low-bg"; }
+function selectedDish() { return dishes.find((dish) => dish.id === selectedDishId) || dishes[0]; }
 function oilAlert() {
-  const oil = ingredients.oil;
-  const rise = (oil.current - oil.before) / oil.before;
-  const affected = dishes
-    .map((dish) => ({ dish, before: dishMargin(dish, "before"), current: dishMargin(dish), suggested: suggestedPrice(dish) }))
-    .filter((item) => item.dish.recipe.some((line) => line.ingredient === "oil") && item.current < 0.65);
+  const oilId = Object.keys(ingredients).find((id) => ingredients[id].name === "Aceite de oliva");
+  const oil = ingredients[oilId] || { current: 0, before: 0 };
+  const rise = oil.before ? (oil.current - oil.before) / oil.before : 0;
+  const affected = dishes.map((dish) => ({ dish, before: dishMargin(dish, "before"), current: dishMargin(dish), suggested: suggestedPrice(dish) })).filter((item) => item.dish.recipe.some((line) => line.ingredient === oilId) && item.current < 0.65);
   return { rise, affected };
+}
+
+function showSync(message) {
+  let note = document.querySelector(".sync-note");
+  if (!note) { note = document.createElement("div"); note.className = "sync-note is-hidden"; document.body.appendChild(note); }
+  note.textContent = message;
+  note.classList.remove("is-hidden");
+  clearTimeout(showSync.timer);
+  showSync.timer = setTimeout(() => note.classList.add("is-hidden"), 2600);
+}
+
+function renderAuthOverlay(message = "") {
+  let overlay = document.querySelector(".auth-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.className = "auth-overlay";
+    overlay.innerHTML = `<section class="auth-panel"><div class="auth-head"><div class="auth-logo">Escan<span>d</span>alia</div><h2>Accede a tu bar</h2><p>Guarda platos, ingredientes y márgenes en la nube.</p></div><div class="auth-body"><label>Email<input class="auth-email" type="email" autocomplete="email" placeholder="tu@email.com" /></label><label>Contraseña<input class="auth-password" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres" /></label><div class="auth-actions"><button class="primary-button auth-login" type="button">Entrar</button><button class="secondary-button auth-signup" type="button">Crear cuenta</button></div><p class="auth-message"></p></div></section>`;
+    document.body.appendChild(overlay);
+  }
+  overlay.querySelector(".auth-message").textContent = message;
+}
+
+function hideAuthOverlay() { document.querySelector(".auth-overlay")?.remove(); }
+function renderSessionChip() {
+  document.querySelector(".session-chip")?.remove();
+  if (!session?.user) return;
+  const chip = document.createElement("div");
+  chip.className = "session-chip";
+  chip.innerHTML = `<span>Conectado a <strong>Supabase</strong></span><button type="button" class="logout-button">Salir</button>`;
+  document.body.appendChild(chip);
+}
+
+async function initSupabase() {
+  try {
+    const config = await fetch("/api/config", { cache: "no-store" }).then((res) => res.json());
+    if (!config.connected) throw new Error("Faltan variables de Supabase en Vercel.");
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+    supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
+    useSupabase = true;
+    const result = await supabase.auth.getSession();
+    session = result.data.session;
+    supabase.auth.onAuthStateChange(async (_event, nextSession) => { session = nextSession; await bootData(); });
+  } catch (error) {
+    console.warn(error);
+    seedLocalFallback();
+  }
+}
+
+function seedLocalFallback() {
+  useSupabase = false;
+  const byName = Object.fromEntries(ingredientSeed.map(([name, unit, current, before]) => [name, slugify(name)]));
+  ingredients = Object.fromEntries(ingredientSeed.map(([name, unit, current, before]) => [byName[name], { name, unit, current, before }]));
+  dishes = dishSeed.map((dish) => ({ ...dish, id: slugify(dish.name), recipe: dish.recipe.map(([name, qty]) => ({ ingredient: byName[name], qty })) }));
+  selectedDishId = dishes[0]?.id || "";
+}
+
+async function ensureSeedData() {
+  const { data: existingBusiness } = await supabase.from("businesses").select("id").limit(1).maybeSingle();
+  if (existingBusiness?.id) return;
+  const { data: createdBusiness, error: businessError } = await supabase.from("businesses").insert({ owner_id: session.user.id, name: business.name, slug: business.slug, target_margin: business.targetMargin }).select("id").single();
+  if (businessError) throw businessError;
+  const createdIngredients = [];
+  for (const [name, unit, current, before] of ingredientSeed) {
+    const { data, error } = await supabase.from("ingredients").insert({ business_id: createdBusiness.id, name, unit, current_cost: current, previous_cost: before }).select("id,name").single();
+    if (error) throw error;
+    createdIngredients.push(data);
+  }
+  const ingredientIds = Object.fromEntries(createdIngredients.map((item) => [item.name, item.id]));
+  for (const dish of dishSeed) {
+    const { data: createdDish, error } = await supabase.from("dishes").insert({ business_id: createdBusiness.id, name: dish.name, category: dish.category, servings: dish.servings, pvp: dish.pvp, published: dish.published, description: dish.description, allergens: dish.allergens, image_key: dish.icon }).select("id").single();
+    if (error) throw error;
+    const lines = dish.recipe.map(([name, qty], index) => ({ dish_id: createdDish.id, ingredient_id: ingredientIds[name], quantity: qty, sort_order: index }));
+    const { error: lineError } = await supabase.from("dish_ingredients").insert(lines);
+    if (lineError) throw lineError;
+  }
+  await supabase.from("menu_languages").insert(business.languages.map((language_code) => ({ business_id: createdBusiness.id, language_code, is_active: true })));
+}
+
+async function loadFromSupabase() {
+  const { data: biz, error: bizError } = await supabase.from("businesses").select("id,name,slug,target_margin").limit(1).single();
+  if (bizError) throw bizError;
+  businessId = biz.id;
+  business = { ...business, name: biz.name, slug: biz.slug, targetMargin: Number(biz.target_margin) };
+  const { data: ing, error: ingError } = await supabase.from("ingredients").select("id,name,unit,current_cost,previous_cost").eq("business_id", businessId).order("name");
+  if (ingError) throw ingError;
+  ingredients = Object.fromEntries(ing.map((item) => [item.id, { name: item.name, unit: item.unit, current: Number(item.current_cost), before: Number(item.previous_cost ?? item.current_cost) }]));
+  const { data: rows, error: dishError } = await supabase.from("dishes").select("id,name,category,servings,pvp,published,description,allergens,image_key,dish_ingredients(quantity,sort_order,ingredient_id)").eq("business_id", businessId).order("created_at");
+  if (dishError) throw dishError;
+  dishes = rows.map((dish) => ({ id: dish.id, name: dish.name, category: dish.category, servings: Number(dish.servings), pvp: Number(dish.pvp), icon: dish.image_key || "olive-thumb", published: dish.published, description: dish.description || "", allergens: dish.allergens || "", recipe: [...(dish.dish_ingredients || [])].sort((a, b) => a.sort_order - b.sort_order).map((line) => ({ ingredient: line.ingredient_id, qty: Number(line.quantity) })) }));
+  selectedDishId = dishes.some((dish) => dish.id === selectedDishId) ? selectedDishId : dishes[0]?.id;
+}
+
+async function bootData() {
+  if (!useSupabase) { seedLocalFallback(); renderAll(); return; }
+  if (!session) { seedLocalFallback(); renderAll(); renderAuthOverlay(); renderSessionChip(); return; }
+  hideAuthOverlay();
+  renderSessionChip();
+  try {
+    await ensureSeedData();
+    await loadFromSupabase();
+    showSync("Datos sincronizados con Supabase");
+  } catch (error) {
+    console.error(error);
+    showSync("No se pudo leer Supabase. Revisa RLS o el SQL.");
+  }
+  renderAll();
 }
 
 function renderHome() {
   const margins = dishes.map((dish) => dishMargin(dish));
-  const averageMargin = margins.reduce((sum, item) => sum + item, 0) / margins.length;
+  const averageMargin = margins.length ? margins.reduce((sum, item) => sum + item, 0) / margins.length : 0;
   const alert = oilAlert();
-
   document.querySelector(".avatar").textContent = business.ownerInitials;
   document.querySelector("[data-screen='home'] .hero h1").textContent = business.name;
   const kpis = document.querySelectorAll("[data-screen='home'] .kpi strong");
-  kpis[0].textContent = percent(averageMargin);
-  kpis[1].textContent = dishes.length;
-  kpis[2].textContent = alert.affected.length;
-
-  const alertCard = document.querySelector(".alert-card");
-  alertCard.querySelector("h2").textContent = `Aceite de oliva +${Math.round(alert.rise * 100)}%`;
-  alertCard.querySelector("p").textContent = `${alert.affected.length} platos han bajado su margen por debajo del 65%`;
-
-  document.querySelector(".dish-list").innerHTML = dishes
-    .map((dish) => {
-      const margin = dishMargin(dish);
-      return `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>Coste: <b>${currency(dishCost(dish))}</b> · PVP: ${currency(dish.pvp)}</p></div><span class="margin-badge ${marginClass(margin)}">${percent(margin)}</span></article>`;
-    })
-    .join("");
+  kpis[0].textContent = percent(averageMargin); kpis[1].textContent = dishes.length; kpis[2].textContent = alert.affected.length;
+  document.querySelector(".alert-card h2").textContent = `Aceite de oliva +${Math.round(alert.rise * 100)}%`;
+  document.querySelector(".alert-card p").textContent = `${alert.affected.length} platos han bajado su margen por debajo del 65%`;
+  document.querySelector(".dish-list").innerHTML = dishes.map((dish) => `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>Coste: <b>${currency(dishCost(dish))}</b> · PVP: ${currency(dish.pvp)}</p></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`).join("");
 }
 
 function renderDetail() {
-  const dish = selectedDish();
+  const dish = selectedDish(); if (!dish) return;
   const screen = document.querySelector("[data-screen='dish-detail']");
   const margin = dishMargin(dish);
   screen.querySelector("h1").innerHTML = dish.name.replace(" de ", " de<br />");
   screen.querySelector(".muted-on-dark").textContent = `${dish.servings} ración${dish.servings > 1 ? "es" : ""} · Actualizado hoy`;
   screen.querySelector(".status-pill strong").textContent = percent(margin);
   screen.querySelector(".status-pill span").textContent = margin >= 0.7 ? "margen bruto ✓ Saludable" : "margen bruto · Revisar";
-  screen.querySelector(".ingredient-list").innerHTML = dish.recipe
-    .map((line) => `<div><span>${ingredients[line.ingredient].name}</span><em>${line.qty} ${ingredients[line.ingredient].unit}</em><b>${currency(ingredientCost(line))}</b></div>`)
-    .join("");
+  screen.querySelector(".ingredient-list").innerHTML = dish.recipe.map((line) => `<div><span>${ingredients[line.ingredient]?.name || "Ingrediente"}</span><em>${line.qty} ${ingredients[line.ingredient]?.unit || ""}</em><b>${currency(ingredientCost(line))}</b></div>`).join("");
   screen.querySelector(".total-card strong").textContent = currency(dishCost(dish));
   screen.querySelector(".price-row strong").textContent = currency(dish.pvp);
+  document.querySelector(".edit-list").innerHTML = screen.querySelector(".ingredient-list").innerHTML;
+  document.querySelector(".sticky-summary").innerHTML = `<span>Coste total <b>${currency(dishCost(dish))}</b></span><span>Margen <b>${percent(margin)}</b></span>`;
 }
 
 function renderQr() {
   const published = dishes.filter((dish) => dish.published);
   const missingDescriptions = dishes.filter((dish) => !dish.description).length;
-  document.querySelectorAll("[data-screen='qr'] .hero p, .qr-card p").forEach((node) => {
-    node.innerHTML = `escandalia.app/<b>${business.slug}</b>`;
-  });
+  document.querySelectorAll("[data-screen='qr'] .hero p, .qr-card p").forEach((node) => { node.innerHTML = `escandalia.app/<b>${business.slug}</b>`; });
   document.querySelector(".state-list").innerHTML = `<article><div class="state-icon check"></div><div><h3>${published.length} platos publicados</h3><p>Última actualización: hoy</p></div></article><article><div class="state-icon globe"></div><div><h3>Traducción IA activa</h3><p>Español · Inglés · Francés</p></div></article><article><div class="state-icon spark"></div><div><h3>${missingDescriptions} platos sin descripción</h3><p>La IA puede completarlos.</p></div></article>`;
 }
 
 function renderIngredientAlert() {
   const alert = oilAlert();
   const screen = document.querySelector("[data-screen='ingredient-alert']");
+  const oil = Object.values(ingredients).find((item) => item.name === "Aceite de oliva") || { before: 0, current: 0 };
   screen.querySelector("h1").textContent = `Aceite de oliva +${Math.round(alert.rise * 100)}%`;
-  screen.querySelector(".impact-grid").innerHTML = `<div><span>Antes</span><b>${currency(ingredients.oil.before * 1000)}/L</b></div><div><span>Ahora</span><b>${currency(ingredients.oil.current * 1000)}/L</b></div><div><span>Impacto</span><b>${alert.affected.length} platos</b></div>`;
+  screen.querySelector(".impact-grid").innerHTML = `<div><span>Antes</span><b>${currency(oil.before * 1000)}/L</b></div><div><span>Ahora</span><b>${currency(oil.current * 1000)}/L</b></div><div><span>Impacto</span><b>${alert.affected.length} platos</b></div>`;
   screen.querySelectorAll(".affected-card").forEach((node) => node.remove());
-  const title = screen.querySelector(".section-title");
-  title.insertAdjacentHTML(
-    "afterend",
-    alert.affected
-      .map((item) => `<article class="affected-card"><h3>${item.dish.name}</h3><p>Antes ${percent(item.before)} · Ahora <b>${percent(item.current)}</b></p><strong>PVP sugerido: ${currency(item.suggested)}</strong></article>`)
-      .join("")
-  );
+  screen.querySelector(".section-title").insertAdjacentHTML("afterend", alert.affected.map((item) => `<article class="affected-card"><h3>${item.dish.name}</h3><p>Antes ${percent(item.before)} · Ahora <b>${percent(item.current)}</b></p><strong>PVP sugerido: ${currency(item.suggested)}</strong></article>`).join(""));
 }
 
 function renderAiPrice() {
-  const item = oilAlert().affected[0] || { dish: selectedDish(), current: dishMargin(selectedDish()) };
-  const dish = item.dish;
+  const dish = oilAlert().affected[0]?.dish || selectedDish(); if (!dish) return;
   const recommended = suggestedPrice(dish);
   const marginWithNewPrice = (recommended - dishCost(dish)) / recommended;
   const screen = document.querySelector("[data-screen='ai-price']");
@@ -218,97 +203,63 @@ function renderAiPrice() {
 }
 
 function renderPublicMenu() {
-  document.querySelector(".public-header h1").textContent = business.name.replace("Bar El Rincón", "La Barra de Ana");
-  document.querySelector("[data-screen='public-menu'] .content").innerHTML = `<div class="category-tabs"><button class="is-selected">Tapas</button><button>Bocadillos</button><button>Bebidas</button></div>${dishes
-    .filter((dish) => dish.published)
-    .map((dish) => `<article class="menu-item"><div><h3>${dish.name}</h3><p>${dish.description || "Descripción pendiente."}</p><span>${dish.allergens}</span></div><strong>${currency(dish.pvp)}</strong></article>`)
-    .join("")}`;
+  document.querySelector(".public-header h1").textContent = business.name;
+  document.querySelector("[data-screen='public-menu'] .content").innerHTML = `<div class="category-tabs"><button class="is-selected">Tapas</button><button>Bocadillos</button><button>Bebidas</button></div>${dishes.filter((dish) => dish.published).map((dish) => `<article class="menu-item"><div><h3>${dish.name}</h3><p>${dish.description || "Descripción pendiente."}</p><span>${dish.allergens}</span></div><strong>${currency(dish.pvp)}</strong></article>`).join("")}`;
 }
 
-function createDishFromForm() {
-  const screen = document.querySelector("[data-screen='add-dish']");
-  const inputs = screen.querySelectorAll("input");
+async function createDishFromForm() {
+  const inputs = document.querySelectorAll("[data-screen='add-dish'] input");
   const name = inputs[0].value.trim();
   const category = inputs[1].value.trim() || "Tapas";
   const servings = Number(inputs[2].value.replace(",", ".")) || 1;
   const pvp = Number(inputs[3].value.replace("€", "").replace(",", ".")) || 0;
   if (!name || dishes.some((dish) => dish.name.toLowerCase() === name.toLowerCase())) return;
-  dishes.push({
-    id: name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-"),
-    name,
-    category,
-    servings,
-    pvp,
-    icon: "prawn",
-    published: false,
-    description: "",
-    allergens: "Pendiente de revisar",
-    recipe: [
-      { ingredient: "ham", qty: 80 },
-      { ingredient: "milk", qty: 250 },
-      { ingredient: "flour", qty: 80 },
-    ],
-  });
-  selectedDishId = dishes[dishes.length - 1].id;
-  renderAll();
+  const baseIngredientNames = ["Jamón", "Leche", "Harina"];
+  const recipe = baseIngredientNames.map((name) => ({ ingredient: Object.keys(ingredients).find((id) => ingredients[id].name === name), qty: name === "Leche" ? 250 : 80 })).filter((line) => line.ingredient);
+  if (useSupabase && session) {
+    const { data, error } = await supabase.from("dishes").insert({ business_id: businessId, name, category, servings, pvp, published: false, description: "", allergens: "Pendiente de revisar", image_key: "prawn" }).select("id").single();
+    if (error) return showSync(error.message);
+    await supabase.from("dish_ingredients").insert(recipe.map((line, index) => ({ dish_id: data.id, ingredient_id: line.ingredient, quantity: line.qty, sort_order: index })));
+    selectedDishId = data.id;
+    await loadFromSupabase();
+  } else {
+    const id = slugify(name); dishes.push({ id, name, category, servings, pvp, icon: "prawn", published: false, description: "", allergens: "Pendiente de revisar", recipe }); selectedDishId = id;
+  }
+  renderAll(); showSync("Plato guardado");
 }
 
-function applyRecommendedPrice() {
-  const alert = oilAlert();
-  const dish = alert.affected[0]?.dish || selectedDish();
-  dish.pvp = suggestedPrice(dish);
-  selectedDishId = dish.id;
-  renderAll();
+async function applyRecommendedPrice() {
+  const dish = oilAlert().affected[0]?.dish || selectedDish(); if (!dish) return;
+  dish.pvp = suggestedPrice(dish); selectedDishId = dish.id;
+  if (useSupabase && session) await supabase.from("dishes").update({ pvp: dish.pvp }).eq("id", dish.id);
+  renderAll(); showSync("Precio actualizado");
 }
 
-function renderAll() {
-  renderHome();
-  renderDetail();
-  renderQr();
-  renderIngredientAlert();
-  renderAiPrice();
-  renderPublicMenu();
-}
+function renderAll() { renderHome(); renderDetail(); renderQr(); renderIngredientAlert(); renderAiPrice(); renderPublicMenu(); }
+function showScreen(name) { renderAll(); screens.forEach((screen) => screen.classList.toggle("is-active", screen.dataset.screen === name)); navButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.go === name)); const primaryScreens = ["home", "qr"]; const publicView = name === "public-menu"; nav.style.display = primaryScreens.includes(name) && !publicView ? "grid" : "none"; fab.style.display = primaryScreens.includes(name) && !publicView ? "block" : "none"; shell.classList.toggle("nav-hidden", !primaryScreens.includes(name) || publicView); if (location.hash.slice(1) !== name) history.replaceState(null, "", `#${name}`); window.scrollTo({ top: 0, behavior: "smooth" }); }
 
-function showScreen(name) {
-  renderAll();
-  screens.forEach((screen) => screen.classList.toggle("is-active", screen.dataset.screen === name));
-  navButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.go === name));
-  const primaryScreens = ["home", "qr"];
-  const publicView = name === "public-menu";
-  nav.style.display = primaryScreens.includes(name) && !publicView ? "grid" : "none";
-  fab.style.display = primaryScreens.includes(name) && !publicView ? "block" : "none";
-  shell.classList.toggle("nav-hidden", !primaryScreens.includes(name) || publicView);
-  if (location.hash.slice(1) !== name) history.replaceState(null, "", `#${name}`);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
+  const authButton = event.target.closest(".auth-login,.auth-signup,.logout-button");
+  if (authButton) {
+    if (authButton.classList.contains("logout-button")) { await supabase.auth.signOut(); return; }
+    const email = document.querySelector(".auth-email")?.value.trim();
+    const password = document.querySelector(".auth-password")?.value;
+    if (!email || !password) return renderAuthOverlay("Introduce email y contraseña.");
+    const action = authButton.classList.contains("auth-signup") ? supabase.auth.signUp({ email, password }) : supabase.auth.signInWithPassword({ email, password });
+    const { error } = await action;
+    if (error) renderAuthOverlay(error.message); else renderAuthOverlay("Revisa tu email si Supabase pide confirmación. Si no, entrarás en unos segundos.");
+    return;
+  }
   const button = event.target.closest("button");
-  if (button?.textContent.trim() === "Guardar plato") createDishFromForm();
-  if (button?.textContent.trim() === "Aplicar nuevo precio" || button?.textContent.trim() === "Aplicar precios sugeridos") applyRecommendedPrice();
-
+  if (button?.textContent.trim() === "Guardar plato") await createDishFromForm();
+  if (button?.textContent.trim() === "Aplicar nuevo precio" || button?.textContent.trim() === "Aplicar precios sugeridos") await applyRecommendedPrice();
   const trigger = event.target.closest("[data-go]");
   if (!trigger) return;
   if (trigger.dataset.dishId) selectedDishId = trigger.dataset.dishId;
   showScreen(trigger.dataset.go);
 });
 
-document.addEventListener("keydown", (event) => {
-  if (event.key !== "Enter" && event.key !== " ") return;
-  const trigger = event.target.closest("[data-go]");
-  if (!trigger) return;
-  event.preventDefault();
-  if (trigger.dataset.dishId) selectedDishId = trigger.dataset.dishId;
-  showScreen(trigger.dataset.go);
-});
+document.addEventListener("keydown", (event) => { if (event.key !== "Enter" && event.key !== " ") return; const trigger = event.target.closest("[data-go]"); if (!trigger) return; event.preventDefault(); if (trigger.dataset.dishId) selectedDishId = trigger.dataset.dishId; showScreen(trigger.dataset.go); });
+document.addEventListener("click", (event) => { const option = event.target.closest(".language-row button, .category-tabs button"); if (!option) return; [...option.parentElement.children].forEach((item) => item.classList.toggle("is-selected", item === option)); });
 
-document.addEventListener("click", (event) => {
-  const option = event.target.closest(".language-row button, .category-tabs button");
-  if (!option) return;
-  [...option.parentElement.children].forEach((item) => item.classList.toggle("is-selected", item === option));
-});
-
-renderAll();
-const initialScreen = location.hash.slice(1);
-if (screens.some((screen) => screen.dataset.screen === initialScreen)) showScreen(initialScreen);
+(async function start() { seedLocalFallback(); renderAll(); await initSupabase(); await bootData(); const initialScreen = location.hash.slice(1); if (screens.some((screen) => screen.dataset.screen === initialScreen)) showScreen(initialScreen); })();
