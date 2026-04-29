@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="auth.css" />
   </head>
   <body>
     <main class="phone-shell" aria-label="Prototipo de Escandalia">
@@ -26,33 +27,18 @@
           <div class="section-title"><span class="icon warning"></span>Alertas de margen</div>
           <article class="alert-card" role="button" tabindex="0" data-go="ingredient-alert"><div class="food-icon olive"></div><div><h2>Aceite de oliva +18%</h2><p>3 platos han bajado su margen por debajo del 65%</p></div></article>
           <div class="section-row"><div class="section-title">Tus platos</div><button class="text-action" type="button" data-go="add-dish">Añadir</button></div>
-          <div class="dish-list">
-            <article class="dish-card" data-go="dish-detail" role="button" tabindex="0"><div class="dish-thumb egg"></div><div class="dish-info"><h3>Tortilla de patatas</h3><p>Coste: <b>0,56€</b> · PVP: 3,00€</p></div><span class="margin-badge good-bg">81%</span></article>
-            <article class="dish-card"><div class="dish-thumb prawn"></div><div class="dish-info"><h3>Gambas al ajillo</h3><p>Coste: <b>2,10€</b> · PVP: 7,50€</p></div><span class="margin-badge good-bg">72%</span></article>
-            <article class="dish-card"><div class="dish-thumb olive-thumb"></div><div class="dish-info"><h3>Ensalada mixta</h3><p>Coste: <b>1,85€</b> · PVP: 5,00€</p></div><span class="margin-badge mid-bg">63%</span></article>
-          </div>
+          <div class="dish-list"></div>
         </div>
       </section>
 
       <section class="app-screen" data-screen="dish-detail">
         <header class="hero hero-brown detail-hero"><div class="orb orb-soft"></div><button class="back" type="button" data-go="home">← Volver</button><h1>Tortilla de<br />patatas</h1><p class="muted-on-dark">1 ración · Actualizado hoy</p><div class="status-pill good-pill"><strong>81%</strong><span>margen bruto ✓ Saludable</span></div></header>
-        <div class="content">
-          <div class="section-title">Ingredientes</div>
-          <div class="ingredient-list"><div><span>Patatas</span><em>200g</em><b>0,13€</b></div><div><span>Huevos</span><em>1,5 uds</em><b>0,35€</b></div><div><span>Aceite de oliva</span><em>20 ml</em><b>0,08€</b></div><div><span>Cebolla</span><em>50g</em><b>0,04€</b></div><div><span>Sal</span><em>—</em><b>0,01€</b></div></div>
-          <div class="total-card"><span>Coste total</span><strong>0,61€</strong></div>
-          <div class="price-row"><span>Precio de venta (PVP)</span><strong>3,00€</strong></div>
-          <button class="primary-button" type="button" data-go="edit-recipe">Editar receta</button><button class="secondary-button ai" type="button" data-go="ai-price">Calcular precio recomendado</button>
-        </div>
+        <div class="content"><div class="section-title">Ingredientes</div><div class="ingredient-list"></div><div class="total-card"><span>Coste total</span><strong>0,61€</strong></div><div class="price-row"><span>Precio de venta (PVP)</span><strong>3,00€</strong></div><button class="primary-button" type="button" data-go="edit-recipe">Editar receta</button><button class="secondary-button ai" type="button" data-go="ai-price">Calcular precio recomendado</button></div>
       </section>
 
       <section class="app-screen" data-screen="qr">
         <header class="hero hero-olive"><div class="orb orb-light"></div><button class="back" type="button" data-go="home">← Volver</button><h1>Tu carta digital</h1><p>escandalia.app/barelrincón</p></header>
-        <div class="content">
-          <article class="qr-card"><div class="qr-box" aria-label="QR de la carta"><span>QR</span></div><p>escandalia.app/<b>barelrincón</b></p><button class="primary-button" type="button">Descargar QR</button><button class="secondary-button" type="button" data-go="public-menu">Ver carta pública</button><div class="language-row" aria-label="Idiomas"><button class="is-selected" type="button">ES</button><button type="button">EN</button><button type="button">FR</button><button type="button">DE</button></div></article>
-          <div class="section-title">Estado de la carta</div>
-          <div class="state-list"><article><div class="state-icon check"></div><div><h3>12 platos publicados</h3><p>Última actualización: hoy</p></div></article><article><div class="state-icon globe"></div><div><h3>Traducción IA activa</h3><p>Español · Inglés · Francés</p></div></article><article><div class="state-icon spark"></div><div><h3>2 platos sin descripción</h3><p>La IA puede completarlos.</p></div></article></div>
-          <button class="primary-button" type="button">Completar con IA</button>
-        </div>
+        <div class="content"><article class="qr-card"><div class="qr-box" aria-label="QR de la carta"><span>QR</span></div><p>escandalia.app/<b>barelrincón</b></p><button class="primary-button" type="button">Descargar QR</button><button class="secondary-button" type="button" data-go="public-menu">Ver carta pública</button><div class="language-row" aria-label="Idiomas"><button class="is-selected" type="button">ES</button><button type="button">EN</button><button type="button">FR</button><button type="button">DE</button></div></article><div class="section-title">Estado de la carta</div><div class="state-list"></div><button class="primary-button" type="button">Completar con IA</button></div>
       </section>
 
       <section class="app-screen" data-screen="add-dish">
@@ -60,25 +46,10 @@
         <div class="content form-content"><label>Nombre del plato<input value="Croquetas de jamón" /></label><label>Categoría<input value="Tapas" /></label><div class="split"><label>Raciones<input value="6" /></label><label>PVP<input value="3,00€" /></label></div><div class="section-title">Ingredientes</div><div class="editable-row"><span>Jamón</span><em>80g</em><b>0,72€</b></div><div class="editable-row"><span>Leche</span><em>250ml</em><b>0,31€</b></div><button class="secondary-button" type="button">Añadir ingrediente</button><div class="summary-panel"><span>Coste estimado</span><strong>1,24€</strong><span>Margen previsto</span><strong class="good-text">72%</strong></div><button class="primary-button" type="button" data-go="home">Guardar plato</button><button class="secondary-button ai" type="button" data-go="ai-price">Calcular precio recomendado</button></div>
       </section>
 
-      <section class="app-screen" data-screen="edit-recipe">
-        <header class="hero hero-brown compact-hero"><button class="back" type="button" data-go="dish-detail">← Volver</button><h1>Editar receta</h1><p>Tortilla de patatas · Margen sano</p></header>
-        <div class="content"><div class="editable-row"><span>Patatas</span><em>200g</em><b>0,13€</b></div><div class="editable-row"><span>Huevos</span><em>1,5 uds</em><b>0,35€</b></div><div class="editable-row"><span>Aceite de oliva</span><em>20 ml</em><b>0,08€</b></div><div class="editable-row"><span>Cebolla</span><em>50g</em><b>0,04€</b></div><div class="sticky-summary"><span>Coste total <b>0,61€</b></span><span>Margen <b>81%</b></span></div><button class="primary-button" type="button" data-go="dish-detail">Guardar cambios</button><button class="secondary-button ai" type="button" data-go="ai-price">Sugerir nuevo PVP</button></div>
-      </section>
-
-      <section class="app-screen" data-screen="ingredient-alert">
-        <header class="hero hero-rust compact-hero"><button class="back" type="button" data-go="home">← Volver</button><h1>Aceite de oliva +18%</h1><p>Detectado en tu última actualización de costes.</p></header>
-        <div class="content"><div class="impact-grid"><div><span>Antes</span><b>5,80 €/L</b></div><div><span>Ahora</span><b>6,84 €/L</b></div><div><span>Impacto</span><b>3 platos</b></div></div><div class="section-title">Platos afectados</div><article class="affected-card"><h3>Croquetas de jamón</h3><p>Antes 66% · Ahora <b>61%</b></p><strong>PVP sugerido: 3,40€</strong></article><article class="affected-card"><h3>Ensaladilla rusa</h3><p>Antes 70% · Ahora <b>64%</b></p><strong>PVP sugerido: 4,10€</strong></article><button class="primary-button" type="button">Aplicar precios sugeridos</button><button class="secondary-button" type="button">Revisar manualmente</button></div>
-      </section>
-
-      <section class="app-screen" data-screen="ai-price">
-        <header class="hero hero-dark compact-hero"><button class="back" type="button" data-go="dish-detail">← Volver</button><h1>Precio recomendado</h1><p>Croquetas de jamón</p></header>
-        <div class="content"><article class="recommendation"><span>PVP recomendado</span><strong>3,40€</strong><p>Para mantener un margen aproximado del 75%.</p></article><div class="compare-list"><div><span>PVP actual</span><b>3,00€</b></div><div><span>Coste actual</span><b>1,18€</b></div><div><span>Margen actual</span><b>61%</b></div><div><span>Con nuevo PVP</span><b>75%</b></div></div><p class="helper-copy">Con el coste actual, este plato está por debajo del margen recomendado. Subirlo recupera rentabilidad sin alejarse demasiado del precio actual.</p><button class="primary-button" type="button">Aplicar nuevo precio</button><button class="secondary-button" type="button">Editar manualmente</button></div>
-      </section>
-
-      <section class="app-screen public-menu" data-screen="public-menu">
-        <header class="public-header"><button class="back dark" type="button" data-go="qr">← Volver</button><h1>La Barra de Ana</h1><p>Carta</p><div class="language-row compact"><button class="is-selected" type="button">ES</button><button type="button">EN</button><button type="button">FR</button></div></header>
-        <div class="content"><div class="category-tabs"><button class="is-selected">Tapas</button><button>Bocadillos</button><button>Bebidas</button></div><article class="menu-item"><div><h3>Tortilla de patatas</h3><p>Jugosa tortilla casera con patata pochada y huevo de corral.</p><span>Contiene huevo</span></div><strong>3,00€</strong></article><article class="menu-item"><div><h3>Gambas al ajillo</h3><p>Gambas salteadas con ajo, aceite de oliva y un punto de guindilla.</p><span>Marisco</span></div><strong>7,50€</strong></article><article class="menu-item"><div><h3>Ensalada mixta</h3><p>Lechuga fresca, tomate, cebolla, aceitunas y atún.</p><span>Disponible hoy</span></div><strong>5,00€</strong></article></div>
-      </section>
+      <section class="app-screen" data-screen="edit-recipe"><header class="hero hero-brown compact-hero"><button class="back" type="button" data-go="dish-detail">← Volver</button><h1>Editar receta</h1><p>Tortilla de patatas · Margen sano</p></header><div class="content"><div class="edit-list"></div><div class="sticky-summary"><span>Coste total <b>0,61€</b></span><span>Margen <b>81%</b></span></div><button class="primary-button" type="button" data-go="dish-detail">Guardar cambios</button><button class="secondary-button ai" type="button" data-go="ai-price">Sugerir nuevo PVP</button></div></section>
+      <section class="app-screen" data-screen="ingredient-alert"><header class="hero hero-rust compact-hero"><button class="back" type="button" data-go="home">← Volver</button><h1>Aceite de oliva +18%</h1><p>Detectado en tu última actualización de costes.</p></header><div class="content"><div class="impact-grid"></div><div class="section-title">Platos afectados</div><button class="primary-button" type="button">Aplicar precios sugeridos</button><button class="secondary-button" type="button">Revisar manualmente</button></div></section>
+      <section class="app-screen" data-screen="ai-price"><header class="hero hero-dark compact-hero"><button class="back" type="button" data-go="dish-detail">← Volver</button><h1>Precio recomendado</h1><p>Croquetas de jamón</p></header><div class="content"><article class="recommendation"><span>PVP recomendado</span><strong>3,40€</strong><p>Para mantener un margen aproximado del 75%.</p></article><div class="compare-list"></div><p class="helper-copy">Con el coste actual, este plato está por debajo del margen recomendado. Subirlo recupera rentabilidad sin alejarse demasiado del precio actual.</p><button class="primary-button" type="button">Aplicar nuevo precio</button><button class="secondary-button" type="button">Editar manualmente</button></div></section>
+      <section class="app-screen public-menu" data-screen="public-menu"><header class="public-header"><button class="back dark" type="button" data-go="qr">← Volver</button><h1>La Barra de Ana</h1><p>Carta</p><div class="language-row compact"><button class="is-selected" type="button">ES</button><button type="button">EN</button><button type="button">FR</button></div></header><div class="content"></div></section>
 
       <nav class="bottom-nav" aria-label="Navegación principal"><button class="is-active" type="button" data-go="home"><span class="nav-icon home"></span>Inicio</button><button type="button" data-go="dish-detail"><span class="nav-icon plate"></span>Escandallos</button><button type="button" data-go="qr"><span class="nav-icon qr"></span>Carta QR</button><button type="button"><span class="nav-icon gear"></span>Ajustes</button></nav>
       <button class="fab" type="button" data-go="add-dish" aria-label="Añadir plato">+</button>
