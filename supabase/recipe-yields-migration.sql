@@ -1,5 +1,6 @@
 -- Escandalia migration: receta base -> rendimiento -> formatos de venta
 -- Run this in Supabase SQL Editor for existing projects.
+-- Safe to run more than once. It does not delete your dishes or ingredients.
 
 alter table public.dishes add column if not exists yield_unit text not null default 'tapas_base';
 alter table public.dishes add column if not exists sale_formats jsonb not null default '[{"id":"tapa","name":"Tapa","portions":1,"pvp":0},{"id":"media","name":"Media racion","portions":2.5,"pvp":0},{"id":"racion","name":"Racion","portions":4,"pvp":0}]'::jsonb;
@@ -13,7 +14,11 @@ set sale_formats = jsonb_build_array(
 where sale_formats is null
    or sale_formats = '[{"id":"tapa","name":"Tapa","portions":1,"pvp":0},{"id":"media","name":"Media racion","portions":2.5,"pvp":0},{"id":"racion","name":"Racion","portions":4,"pvp":0}]'::jsonb;
 
-create or replace view public.dish_costs as
+-- The old view has a different column order, so we recreate only the view.
+-- This does not remove data: views are just saved calculations.
+drop view if exists public.dish_costs;
+
+create view public.dish_costs as
 with recipe_costs as (
   select
     d.id as dish_id,
