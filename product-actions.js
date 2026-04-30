@@ -1,11 +1,27 @@
 function ensureProductScreens() {
   const nav = document.querySelector('.bottom-nav');
+  if (!nav) return;
   if (!document.querySelector('[data-screen="ingredient-costs"]')) {
     nav.insertAdjacentHTML('beforebegin', `<section class="app-screen" data-screen="ingredient-costs"><header class="hero hero-rust compact-hero"><button class="back" type="button" data-go="ingredient-alert">← Volver</button><h1>Revisar compra</h1><p>Edita el coste actual de cada producto.</p></header><div class="content"><div class="section-title">Costes de ingredientes</div><div class="cost-editor"></div><button class="primary-button save-costs" type="button">Guardar costes</button></div></section>`);
   }
   if (!document.querySelector('[data-screen="settings"]')) {
-    nav.insertAdjacentHTML('beforebegin', `<section class="app-screen" data-screen="settings"><header class="hero hero-dark compact-hero"><button class="back" type="button" data-go="home">← Volver</button><h1>Ajustes</h1><p>Configura el negocio y el margen objetivo.</p></header><div class="content"><article class="settings-card"><h3>Negocio</h3><p class="settings-business">Bar El Rincón</p></article><article class="settings-card"><h3>Margen objetivo</h3><p class="settings-margin">75%</p></article><article class="settings-card"><h3>Supabase</h3><p>Datos guardados en la nube para trabajar desde cualquier PC.</p></article></div></section>`);
+    nav.insertAdjacentHTML('beforebegin', `<section class="app-screen" data-screen="settings"><header class="hero hero-dark compact-hero"><button class="back" type="button" data-go="home">← Volver</button><h1>Ajustes</h1><p>Tu negocio, margen objetivo y cuenta en la nube.</p></header><div class="content settings-content"><article class="settings-card settings-main"><span class="settings-kicker">Negocio</span><h3 class="settings-business">Bar El Rincón</h3><p>Estos datos se usan en el dashboard, carta QR y escandallos.</p></article><article class="settings-card"><div><span class="settings-kicker">Margen objetivo</span><h3 class="settings-margin">75%</h3><p>Escandalia te avisará cuando un plato quede por debajo.</p></div></article><article class="settings-card"><div><span class="settings-kicker">Carta pública</span><h3 class="settings-menu-url">escandalia.app/barelrincón</h3><p>URL que verán tus clientes al escanear el QR.</p></div></article><article class="settings-card settings-account"><div><span class="settings-kicker">Cuenta y nube</span><h3 class="settings-cloud">Guardado en Supabase</h3><p class="settings-email">Sesión activa.</p></div><button class="secondary-button logout-button" type="button">Salir</button></article></div></section>`);
   }
+}
+
+function activateDynamicScreen(name) {
+  const screen = document.querySelector(`[data-screen="${name}"]`);
+  if (!screen) return;
+  document.querySelectorAll('.app-screen').forEach((item) => item.classList.toggle('is-active', item === screen));
+  document.querySelectorAll('.bottom-nav button').forEach((button) => button.classList.toggle('is-active', button.dataset.go === name));
+  const isPrimary = ['home', 'qr', 'settings'].includes(name);
+  const isPublic = name === 'public-menu';
+  const bottomNav = document.querySelector('.bottom-nav');
+  const quickAdd = document.querySelector('.fab');
+  const phoneShell = document.querySelector('.phone-shell');
+  if (bottomNav) bottomNav.style.display = isPrimary && !isPublic ? 'grid' : 'none';
+  if (quickAdd) quickAdd.style.display = isPrimary && !isPublic ? 'block' : 'none';
+  phoneShell?.classList.toggle('nav-hidden', !isPrimary || isPublic);
 }
 
 function renderCostEditor() {
@@ -27,10 +43,18 @@ function renderRecipeEditor() {
 function renderSettingsScreen() {
   const name = business?.name || 'Tu negocio';
   const margin = Math.round((business?.targetMargin || 0.75) * 100);
+  const slug = business?.slug || 'tu-bar';
+  const email = session?.user?.email || 'Sin sesión activa';
   const businessNode = document.querySelector('.settings-business');
   const marginNode = document.querySelector('.settings-margin');
+  const urlNode = document.querySelector('.settings-menu-url');
+  const emailNode = document.querySelector('.settings-email');
+  const cloudNode = document.querySelector('.settings-cloud');
   if (businessNode) businessNode.textContent = name;
   if (marginNode) marginNode.textContent = `${margin}% de margen bruto objetivo`;
+  if (urlNode) urlNode.textContent = `escandalia.app/${slug}`;
+  if (emailNode) emailNode.textContent = email;
+  if (cloudNode) cloudNode.textContent = session?.user ? 'Datos guardados en la nube' : 'Modo sin sesión';
 }
 
 function prepareEmptyDishForm() {
@@ -85,13 +109,19 @@ async function saveRecipeQuantities() {
 const originalShowScreen = showScreen;
 showScreen = function patchedShowScreen(name) {
   originalShowScreen(name);
+  activateDynamicScreen(name);
   if (name === 'ingredient-costs') renderCostEditor();
   if (name === 'edit-recipe') renderRecipeEditor();
   if (name === 'settings') renderSettingsScreen();
   if (name === 'add-dish') prepareEmptyDishForm();
 };
 
-const originalCreateDishFromForm = createDishFromForm;
+const originalRenderSessionChip = renderSessionChip;
+renderSessionChip = function settingsOnlySessionState() {
+  document.querySelector('.session-chip')?.remove();
+  renderSettingsScreen();
+};
+
 createDishFromForm = async function createBlankDishFromForm() {
   const inputs = document.querySelectorAll('[data-screen="add-dish"] input');
   const name = inputs[0]?.value.trim();
@@ -116,8 +146,10 @@ createDishFromForm = async function createBlankDishFromForm() {
 };
 
 ensureProductScreens();
+document.querySelector('.session-chip')?.remove();
 
 setInterval(() => {
+  document.querySelector('.session-chip')?.remove();
   document.querySelectorAll('[data-screen="home"] .kpi').forEach((card, index) => {
     card.tabIndex = 0;
     card.dataset.action = index === 1 ? 'active-dishes' : index === 2 ? 'alerts' : 'margin';
