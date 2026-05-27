@@ -135,10 +135,15 @@ renderAiPrice = function patchedRenderAiPrice() {
   screen.querySelector('.compare-list').innerHTML = `<div><span>PVP actual</span><b>${currency(format.pvp)}</b></div><div><span>Coste ${format.name}</span><b>${currency(formatCost(dish, format))}</b></div><div><span>Margen actual</span><b>${percent(formatMargin(dish, format))}</b></div><div><span>Con nuevo PVP</span><b>${percent(marginWithNewPrice)}</b></div>`;
 };
 
+function resolveDishFormats(dish) {
+  if (!dish) return [];
+  if (dish.formats?.length) return dish.formats;
+  return ensureDishFormats(dish);
+}
+
 function applyFormatChanges(dish) {
   const yieldInput = document.querySelector('.yield-input');
   if (yieldInput) dish.servings = Math.max(numberFromInput(yieldInput.value, yieldCount(dish)), 1);
-  ensureDishFormats(dish);
   document.querySelectorAll('[data-format-portions]').forEach((input) => {
     const index = Number(input.dataset.formatPortions);
     if (dish.formats[index]) dish.formats[index].portions = Math.max(numberFromInput(input.value, dish.formats[index].portions), 0.01);
@@ -178,6 +183,7 @@ async function saveRecipeQuantities() {
     const ingredientInput = document.querySelector(`[data-recipe-ingredient="${index}"]`);
     return { ingredient: ingredientInput?.value, qty: Math.max(numberFromInput(input.value, dish.recipe[index]?.qty || 1), 0.0001) };
   }).filter((line) => line.ingredient);
+  ensureDishFormats(dish);
   applyFormatChanges(dish);
   if (typeof useSupabase !== 'undefined' && useSupabase && session && supabase) {
     await supabase.from('dishes').update({ servings: dish.servings, pvp: dish.pvp }).eq('id', dish.id);
