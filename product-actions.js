@@ -1,46 +1,4 @@
-function baseRecipeCost(dish, mode = 'current') {
-  return (dish?.recipe || []).reduce((total, line) => total + ingredientCost(line, mode), 0);
-}
-
-function yieldCount(dish) {
-  return Math.max(Number(dish?.servings) || 1, 1);
-}
-
-function unitCost(dish, mode = 'current') {
-  return baseRecipeCost(dish, mode) / yieldCount(dish);
-}
-
-function defaultFormats(dish) {
-  const basePvp = Number(dish?.pvp) || 0;
-  if (Array.isArray(dish?.formats) && dish.formats.length) return dish.formats;
-  return [
-    { id: 'tapa', name: 'Tapa', portions: 1, pvp: basePvp },
-    { id: 'media', name: 'Media racion', portions: 2.5, pvp: roundMoney(basePvp * 2.2) },
-    { id: 'racion', name: 'Racion', portions: 4, pvp: roundMoney(basePvp * 3.5) },
-  ];
-}
-
-function primaryFormat(dish) {
-  return defaultFormats(dish)[0] || { id: 'tapa', name: 'Tapa', portions: 1, pvp: Number(dish?.pvp) || 0 };
-}
-
-function formatCost(dish, format, mode = 'current') {
-  return unitCost(dish, mode) * (Number(format?.portions) || 1);
-}
-
-function formatMargin(dish, format, mode = 'current') {
-  const pvp = Number(format?.pvp) || 0;
-  return pvp > 0 ? (pvp - formatCost(dish, format, mode)) / pvp : 0;
-}
-
-function roundMoney(value) {
-  return Math.round((Number(value) || 0) * 100) / 100;
-}
-
-function numberFromInput(value, fallback = 0) {
-  const parsed = Number(String(value || '').replace('€', '').replace(',', '.'));
-  return Number.isFinite(parsed) ? parsed : fallback;
-}
+/* cost functions moved to cost-engine.js */
 
 function ensureDishFormats(dish) {
   if (!dish) return [];
@@ -52,19 +10,6 @@ function ensureDishFormats(dish) {
   }));
   return dish.formats;
 }
-
-dishCost = function patchedDishCost(dish, mode = 'current') {
-  return formatCost(dish, primaryFormat(dish), mode);
-};
-
-dishMargin = function patchedDishMargin(dish, mode = 'current') {
-  return formatMargin(dish, primaryFormat(dish), mode);
-};
-
-suggestedPrice = function patchedSuggestedPrice(dish, target = business.targetMargin, format = primaryFormat(dish)) {
-  const cost = formatCost(dish, format);
-  return Math.ceil((cost / (1 - target)) * 20) / 20;
-};
 
 function ensureProductScreens() {
   const nav = document.querySelector('.bottom-nav');

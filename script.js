@@ -24,14 +24,7 @@ const nav = document.querySelector(".bottom-nav");
 const fab = document.querySelector(".fab");
 const shell = document.querySelector(".phone-shell");
 
-function currency(value) { return `${Number(value || 0).toFixed(2).replace(".", ",")}€`; }
-function percent(value) { return `${Math.round((value || 0) * 100)}%`; }
-function slugify(value) { return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
-function ingredientCost(line, mode = "current") { return (ingredients[line.ingredient]?.[mode] || 0) * line.qty; }
-function dishCost(dish, mode = "current") { return dish.recipe.reduce((total, line) => total + ingredientCost(line, mode), 0); }
-function dishMargin(dish, mode = "current") { return dish.pvp > 0 ? (dish.pvp - dishCost(dish, mode)) / dish.pvp : 0; }
-function suggestedPrice(dish, target = business.targetMargin) { return Math.ceil((dishCost(dish) / (1 - target)) * 20) / 20; }
-function marginClass(margin) { if (margin >= 0.7) return "good-bg"; if (margin >= 0.62) return "mid-bg"; return "low-bg"; }
+/* slugify moved to cost-engine.js */
 function selectedDish() { return dishes.find((dish) => dish.id === selectedDishId) || dishes[0]; }
 function oilAlert() {
   const oilId = Object.keys(ingredients).find((id) => ingredients[id].name === "Aceite de oliva");
