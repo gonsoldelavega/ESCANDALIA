@@ -99,28 +99,29 @@ function renderProfitCard(dish) {
     </div>`;
 
   // Insertar después de price-row, antes del botón editar
-  const priceRow = screen.querySelector(".price-row");
+  const detailScreen = document.querySelector("[data-screen='dish-detail']");
+  const priceRow = detailScreen?.querySelector(".price-row");
   if (priceRow) {
     // Eliminar profit-card anterior si existe
-    screen.querySelector("#profit-card")?.remove();
+    detailScreen.querySelector("#profit-card")?.remove();
     priceRow.insertAdjacentHTML("afterend", html);
   }
 
   // Bind inputs del simulador
-  const margenInput = screen.querySelector("#sim-margen");
-  const ventasInput = screen.querySelector("#sim-ventas");
+  const margenInput = detailScreen?.querySelector("#sim-margen");
+  const ventasInput = detailScreen?.querySelector("#sim-ventas");
   const recalculate = () => {
     const tm = (Number(margenInput?.value) || 75) / 100;
     const vs = Number(ventasInput?.value) || 0;
     const newRec = suggestedPrice(dish, tm, fmt);
     const newImpact = monthlyImpact(dish, tm, vs, fmt);
-    const impactBox = screen.querySelector("#profit-card .profit-impact-box");
+    const impactBox = detailScreen?.querySelector("#profit-card .profit-impact-box");
     if (impactBox) {
       impactBox.querySelector(".profit-impact-value").textContent = `${newImpact >= 0 ? '+' : ''}${currency(newImpact)}`;
       impactBox.querySelector(".profit-impact-sub").textContent = `ajustando PVP a ${currency(newRec)} con ${vs} ventas/sem`;
     }
     // Actualizar PVP recomendado en la grid
-    const recEl = screen.querySelector("#profit-card .profit-metric-value.positive");
+    const recEl = detailScreen?.querySelector("#profit-card .profit-metric-value.positive");
     if (recEl) recEl.textContent = currency(newRec);
   };
   margenInput?.addEventListener("input", recalculate);
