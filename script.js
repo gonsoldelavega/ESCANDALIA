@@ -140,6 +140,8 @@ async function bootData() {
   renderAll();
 }
 
+// ─── Render Sections ────────────────────────────────────────────────
+
 function renderHome() {
   const margins = dishes.map((dish) => dishMargin(dish));
   const averageMargin = margins.length ? margins.reduce((sum, item) => sum + item, 0) / margins.length : 0;
@@ -200,6 +202,30 @@ function renderPublicMenu() {
   document.querySelector("[data-screen='public-menu'] .content").innerHTML = `<div class="category-tabs"><button class="is-selected">Tapas</button><button>Bocadillos</button><button>Bebidas</button></div>${dishes.filter((dish) => dish.published).map((dish) => `<article class="menu-item"><div><h3>${dish.name}</h3><p>${dish.description || "Descripción pendiente."}</p><span>${dish.allergens}</span></div><strong>${currency(dish.pvp)}</strong></article>`).join("")}`;
 }
 
+// ─── Orchestrator ───────────────────────────────────────────────────
+
+function renderAll() {
+  renderHome();
+  renderDetail();
+  renderQr();
+  renderIngredientAlert();
+  renderAiPrice();
+  renderPublicMenu();
+}
+
+function showScreen(name) {
+  renderAll();
+  screens.forEach((screen) => screen.classList.toggle("is-active", screen.dataset.screen === name));
+  navButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.go === name));
+  const primaryScreens = ["home", "qr"];
+  const publicView = name === "public-menu";
+  nav.style.display = primaryScreens.includes(name) && !publicView ? "grid" : "none";
+  fab.style.display = primaryScreens.includes(name) && !publicView ? "block" : "none";
+  shell.classList.toggle("nav-hidden", !primaryScreens.includes(name) || publicView);
+  if (location.hash.slice(1) !== name) history.replaceState(null, "", `#${name}`);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 async function createDishFromForm() {
   const inputs = document.querySelectorAll("[data-screen='add-dish'] input");
   const name = inputs[0].value.trim();
@@ -227,9 +253,6 @@ async function applyRecommendedPrice() {
   if (useSupabase && session) await supabase.from("dishes").update({ pvp: dish.pvp }).eq("id", dish.id);
   renderAll(); showSync("Precio actualizado");
 }
-
-function renderAll() { renderHome(); renderDetail(); renderQr(); renderIngredientAlert(); renderAiPrice(); renderPublicMenu(); }
-function showScreen(name) { renderAll(); screens.forEach((screen) => screen.classList.toggle("is-active", screen.dataset.screen === name)); navButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.go === name)); const primaryScreens = ["home", "qr"]; const publicView = name === "public-menu"; nav.style.display = primaryScreens.includes(name) && !publicView ? "grid" : "none"; fab.style.display = primaryScreens.includes(name) && !publicView ? "block" : "none"; shell.classList.toggle("nav-hidden", !primaryScreens.includes(name) || publicView); if (location.hash.slice(1) !== name) history.replaceState(null, "", `#${name}`); window.scrollTo({ top: 0, behavior: "smooth" }); }
 
 document.addEventListener("click", async (event) => {
   const authButton = event.target.closest(".auth-login,.auth-signup,.logout-button");
