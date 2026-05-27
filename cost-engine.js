@@ -146,3 +146,39 @@ function monthlyImpact(dish, targetMargin, ventasSemana, format = primaryFormat(
   const current = Number(format?.pvp) || 0;
   return roundMoney((rec - current) * ventasSemana * 4);
 }
+
+/* ==========================================================================
+ * Badge helpers (Sprint 2)
+ * ========================================================================== */
+
+/** Determina el estado de rentabilidad de un plato (reutiliza profitStatus) */
+function dishBadgeStatus(dish) {
+  const pvp = Number(dish?.pvp) || 0;
+  if (pvp <= 0) return 'sin-datos';
+  const fc = foodCostPct(dish);
+  if (fc <= 0.30) return 'rentable';
+  if (fc <= 0.40) return 'revisar';
+  return 'peligroso';
+}
+
+/** Clase CSS para el badge compacto en lista de platos */
+function dishBadgeClass(status) {
+  if (status === 'rentable') return 'badge-good';
+  if (status === 'revisar') return 'badge-mid';
+  if (status === 'peligroso') return 'badge-bad';
+  return 'badge-none';
+}
+
+/** Texto legible del badge */
+function dishBadgeLabel(status) {
+  if (status === 'rentable') return 'Rentable';
+  if (status === 'revisar') return 'Revisar';
+  if (status === 'peligroso') return 'Peligroso';
+  return 'Sin datos';
+}
+
+/** HTML del badge compacto para inserción en dish-card */
+function profitBadgeHtml(dish) {
+  const status = dishBadgeStatus(dish);
+  return `<span class="profit-badge-inline ${dishBadgeClass(status)}">${dishBadgeLabel(status)}</span>`;
+}

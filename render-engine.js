@@ -21,7 +21,7 @@ function renderHome() {
   kpis[0].textContent = percent(averageMargin); kpis[1].textContent = dishes.length; kpis[2].textContent = alert.affected.length;
   document.querySelector(".alert-card h2").textContent = `Aceite de oliva +${Math.round(alert.rise * 100)}%`;
   document.querySelector(".alert-card p").textContent = `${alert.affected.length} platos han bajado su margen por debajo del 65%`;
-  document.querySelector(".dish-list").innerHTML = dishes.map((dish) => `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>Coste: <b>${currency(dishCost(dish))}</b> · PVP: ${currency(dish.pvp)}</p></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`).join("");
+  document.querySelector(".dish-list").innerHTML = dishes.map((dish) => `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>Coste: <b>${currency(dishCost(dish))}</b> · PVP: ${currency(dish.pvp)}</p></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span>${profitBadgeHtml(dish)}</article>`).join("");
 }
 
 function renderDetail() {
@@ -53,6 +53,17 @@ function renderProfitCard(dish) {
   const recPvp = suggestedPrice(dish, targetMargin, fmt);
   const ventasSemana = 20;
   const impact = monthlyImpact(dish, targetMargin, ventasSemana, fmt);
+
+  // Microcopy del impacto: si el PVP actual ya está por encima del recomendado
+  const alreadyAbove = pvp >= recPvp;
+  let impactText, impactSubText;
+  if (alreadyAbove) {
+    impactText = `+${currency(Math.abs(impact))}`;
+    impactSubText = `Ya estás por encima del PVP recomendado (${currency(recPvp)})`;
+  } else {
+    impactText = `${impact >= 0 ? '+' : ''}${currency(impact)}`;
+    impactSubText = `subiendo PVP de ${currency(pvp)} a ${currency(recPvp)} con ${ventasSemana} ventas/sem`;
+  }
 
   const html = `
     <div class="profit-card" id="profit-card">
@@ -91,10 +102,10 @@ function renderProfitCard(dish) {
         <input class="profit-sim-input" id="sim-margen" type="number" placeholder="Margen objetivo %" value="${Math.round(targetMargin * 100)}" min="10" max="95" />
         <input class="profit-sim-input" id="sim-ventas" type="number" placeholder="Ventas/sem" value="${ventasSemana}" min="1" max="500" />
       </div>
-      <div class="profit-impact-box">
-        <div class="profit-impact-label">Impacto mensual estimado</div>
-        <div class="profit-impact-value">${impact >= 0 ? '+' : ''}${currency(impact)}</div>
-        <div class="profit-impact-sub">ajustando PVP a ${currency(recPvp)} con ${ventasSemana} ventas/sem</div>
+      <div class="profit-impact-box ${alreadyAbove ? 'profit-impact-already' : ''}">
+        <div class="profit-impact-label">${alreadyAbove ? 'Estado actual' : 'Impacto mensual estimado'}</div>
+        <div class="profit-impact-value">${alreadyAbove ? '✓ Por encima de objetivo' : impactText}</div>
+        <div class="profit-impact-sub">${impactSubText}</div>
       </div>
     </div>`;
 
@@ -117,8 +128,15 @@ function renderProfitCard(dish) {
     const newImpact = monthlyImpact(dish, tm, vs, fmt);
     const impactBox = detailScreen?.querySelector("#profit-card .profit-impact-box");
     if (impactBox) {
-      impactBox.querySelector(".profit-impact-value").textContent = `${newImpact >= 0 ? '+' : ''}${currency(newImpact)}`;
-      impactBox.querySelector(".profit-impact-sub").textContent = `ajustando PVP a ${currency(newRec)} con ${vs} ventas/sem`;
+      const simAlreadyAbove = pvp >= newRec;
+      const newImpactText = simAlreadyAbove ? "✓ Por encima de objetivo" : `${newImpact >= 0 ? '+' : ''}${currency(newImpact)}`;
+      const newImpactSub = simAlreadyAbove
+        ? `Ya estás por encima del PVP recomendado (${currency(newRec)})`
+        : `subiendo PVP de ${currency(pvp)} a ${currency(newRec)} con ${vs} ventas/sem`;
+      impactBox.querySelector(".profit-impact-value").textContent = newImpactText;
+      impactBox.querySelector(".profit-impact-sub").textContent = newImpactSub;
+      impactBox.querySelector(".profit-impact-label").textContent = simAlreadyAbove ? "Estado actual" : "Impacto mensual estimado";
+      impactBox.classList.toggle("profit-impact-already", simAlreadyAbove);
     }
     // Actualizar PVP recomendado en la grid
     const recEl = detailScreen?.querySelector("#profit-card .profit-metric-value.positive");
