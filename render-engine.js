@@ -37,6 +37,94 @@ function renderDetail() {
   screen.querySelector(".price-row strong").textContent = currency(dish.pvp);
   document.querySelector(".edit-list").innerHTML = screen.querySelector(".ingredient-list").innerHTML;
   document.querySelector(".sticky-summary").innerHTML = `<span>Coste total <b>${currency(dishCost(dish))}</b></span><span>Margen <b>${percent(margin)}</b></span>`;
+  renderProfitCard(dish);
+}
+
+function renderProfitCard(dish) {
+  const fmt = primaryFormat(dish);
+  const cost = formatCost(dish, fmt);
+  const pvp = Number(fmt?.pvp) || 0;
+  const marginEur = profitMarginEuros(dish, fmt);
+  const marginPct = dishMargin(dish);
+  const fc = foodCostPct(dish, fmt);
+  const status = profitStatus(dish, fmt);
+  const statusClass = profitStatusClass(status);
+  const targetMargin = business?.targetMargin || 0.75;
+  const recPvp = suggestedPrice(dish, targetMargin, fmt);
+  const ventasSemana = 20;
+  const impact = monthlyImpact(dish, targetMargin, ventasSemana, fmt);
+
+  const html = `
+    <div class="profit-card" id="profit-card">
+      <div class="profit-card-header">
+        <span class="profit-card-title">Rentabilidad</span>
+        <span class="profit-status-badge ${statusClass}">${status}</span>
+      </div>
+      <div class="profit-metrics-grid">
+        <div class="profit-metric">
+          <div class="profit-metric-label">Coste ración</div>
+          <div class="profit-metric-value neutral">${currency(cost)}</div>
+        </div>
+        <div class="profit-metric">
+          <div class="profit-metric-label">PVP actual</div>
+          <div class="profit-metric-value neutral">${currency(pvp)}</div>
+        </div>
+        <div class="profit-metric">
+          <div class="profit-metric-label">Margen €</div>
+          <div class="profit-metric-value ${marginEur >= 0 ? 'positive' : 'negative'}">${currency(marginEur)}</div>
+        </div>
+        <div class="profit-metric">
+          <div class="profit-metric-label">Margen %</div>
+          <div class="profit-metric-value ${marginPct >= 0.7 ? 'positive' : marginPct >= 0.62 ? 'neutral' : 'negative'}">${percent(marginPct)}</div>
+        </div>
+        <div class="profit-metric">
+          <div class="profit-metric-label">Food cost</div>
+          <div class="profit-metric-value ${fc <= 0.3 ? 'positive' : fc <= 0.4 ? 'neutral' : 'negative'}">${percent(fc)}</div>
+        </div>
+        <div class="profit-metric">
+          <div class="profit-metric-label">PVP recomendado</div>
+          <div class="profit-metric-value positive">${currency(recPvp)}</div>
+        </div>
+      </div>
+      <div class="profit-sim-label">Simulador</div>
+      <div class="profit-sim-row">
+        <input class="profit-sim-input" id="sim-margen" type="number" placeholder="Margen objetivo %" value="${Math.round(targetMargin * 100)}" min="10" max="95" />
+        <input class="profit-sim-input" id="sim-ventas" type="number" placeholder="Ventas/sem" value="${ventasSemana}" min="1" max="500" />
+      </div>
+      <div class="profit-impact-box">
+        <div class="profit-impact-label">Impacto mensual estimado</div>
+        <div class="profit-impact-value">${impact >= 0 ? '+' : ''}${currency(impact)}</div>
+        <div class="profit-impact-sub">ajustando PVP a ${currency(recPvp)} con ${ventasSemana} ventas/sem</div>
+      </div>
+    </div>`;
+
+  // Insertar después de price-row, antes del botón editar
+  const priceRow = screen.querySelector(".price-row");
+  if (priceRow) {
+    // Eliminar profit-card anterior si existe
+    screen.querySelector("#profit-card")?.remove();
+    priceRow.insertAdjacentHTML("afterend", html);
+  }
+
+  // Bind inputs del simulador
+  const margenInput = screen.querySelector("#sim-margen");
+  const ventasInput = screen.querySelector("#sim-ventas");
+  const recalculate = () => {
+    const tm = (Number(margenInput?.value) || 75) / 100;
+    const vs = Number(ventasInput?.value) || 0;
+    const newRec = suggestedPrice(dish, tm, fmt);
+    const newImpact = monthlyImpact(dish, tm, vs, fmt);
+    const impactBox = screen.querySelector("#profit-card .profit-impact-box");
+    if (impactBox) {
+      impactBox.querySelector(".profit-impact-value").textContent = `${newImpact >= 0 ? '+' : ''}${currency(newImpact)}`;
+      impactBox.querySelector(".profit-impact-sub").textContent = `ajustando PVP a ${currency(newRec)} con ${vs} ventas/sem`;
+    }
+    // Actualizar PVP recomendado en la grid
+    const recEl = screen.querySelector("#profit-card .profit-metric-value.positive");
+    if (recEl) recEl.textContent = currency(newRec);
+  };
+  margenInput?.addEventListener("input", recalculate);
+  ventasInput?.addEventListener("input", recalculate);
 }
 
 function renderQr() {

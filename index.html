@@ -10,6 +10,93 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="auth.css" />
     <link rel="stylesheet" href="product-actions.css" />
+    <style>
+/* ─── Profitability Card (Sprint 1) ─── */
+.profit-card {
+  background: #1a1a2e;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 12px 0;
+  color: #eee;
+}
+.profit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.profit-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #aaa;
+}
+.profit-status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.profit-good { background: #1b5e20; color: #a5d6a7; }
+.profit-mid { background: #e65100; color: #ffcc80; }
+.profit-bad { background: #b71c1c; color: #ef9a9a; }
+.profit-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.profit-metric {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 10px;
+}
+.profit-metric-label {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 2px;
+}
+.profit-metric-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+.profit-metric-value.positive { color: #66bb6a; }
+.profit-metric-value.negative { color: #ef5350; }
+.profit-metric-value.neutral { color: #fff; }
+.profit-sim-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+.profit-sim-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.profit-sim-input {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #fff;
+  font-size: 14px;
+}
+.profit-sim-input::placeholder { color: #666; }
+.profit-impact-box {
+  background: rgba(102,187,106,0.12);
+  border: 1px solid rgba(102,187,106,0.25);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.profit-impact-label { font-size: 11px; color: #81c784; }
+.profit-impact-value { font-size: 22px; font-weight: 800; color: #66bb6a; }
+.profit-impact-sub { font-size: 11px; color: #888; }
+    </style>
   </head>
   <body>
     <main class="phone-shell" aria-label="Prototipo de Escandalia">

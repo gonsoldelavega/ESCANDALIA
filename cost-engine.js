@@ -108,3 +108,41 @@ function slugify(value) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
+
+/* ==========================================================================
+ * Profitability helpers (Sprint 1)
+ * ========================================================================== */
+
+/** Food cost %: coste / pvp (0..1). <30% excelente, <40% ok, >=40% alto */
+function foodCostPct(dish, format = primaryFormat(dish)) {
+  const pvp = Number(format?.pvp) || 0;
+  if (pvp <= 0) return 0;
+  return roundMoney(formatCost(dish, format) / pvp);
+}
+
+/** Margen en euros: pvp - coste */
+function profitMarginEuros(dish, format = primaryFormat(dish)) {
+  return roundMoney(Number(format?.pvp) - formatCost(dish, format));
+}
+
+/** Estado visual de rentabilidad */
+function profitStatus(dish, format = primaryFormat(dish)) {
+  const fc = foodCostPct(dish, format);
+  if (fc <= 0.30) return 'rentable';
+  if (fc <= 0.40) return 'revisar';
+  return 'peligroso';
+}
+
+/** Clase CSS para el estado */
+function profitStatusClass(status) {
+  if (status === 'rentable') return 'profit-good';
+  if (status === 'revisar') return 'profit-mid';
+  return 'profit-bad';
+}
+
+/** Impacto mensual estimado: (precioRecomendado - pvpActual) * ventasSemana * 4 */
+function monthlyImpact(dish, targetMargin, ventasSemana, format = primaryFormat(dish)) {
+  const rec = suggestedPrice(dish, targetMargin, format);
+  const current = Number(format?.pvp) || 0;
+  return roundMoney((rec - current) * ventasSemana * 4);
+}
