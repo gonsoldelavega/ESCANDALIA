@@ -1,3 +1,6 @@
+// Ownership note: this file is the planned single owner for the
+// "apply recommended price" flow. Current duplicated implementations in other
+// files are delegation candidates until Phase B/C remove the overlap.
 document.addEventListener('click', async (event) => {
   const button = event.target.closest('button');
   if (!button) return;
