@@ -1,16 +1,16 @@
 # Escandalia
 
-Prototipo cloud-first de Escandalia, una app mobile-first para bares, cafeterias y restaurantes que ayuda a controlar escandallos, margenes, alertas de subida de ingredientes y carta QR publica.
+Prototipo cloud-first de Escandalia, una app mobile-first para bares, cafeterías y restaurantes que ayuda a controlar escandallos, márgenes, alertas de subida de ingredientes y carta QR pública.
 
 ## Estado actual
 
 - Prototipo visual navegable en HTML, CSS y JavaScript.
-- Direccion visual premium, calida y mediterranea.
-- Pantallas incluidas: Dashboard, detalle de escandallo, Carta QR, anadir plato, editar receta, alerta de ingrediente, sugerencia IA y carta publica.
-- Primer motor de calculo en frontend para costes, margenes, alertas y PVP recomendado.
+- Dirección visual premium, cálida y mediterránea.
+- Pantallas incluidas: Dashboard, detalle de escandallo, Carta QR, añadir plato, editar receta, alerta de ingrediente, sugerencia IA y carta pública.
+- Primer motor de cálculo en frontend para costes, márgenes, alertas y PVP recomendado.
 - Esquema inicial de Supabase preparado en `supabase/schema.sql`.
 
-## Web publica
+## Web pública
 
 https://escandalia.vercel.app/
 
@@ -28,6 +28,6 @@ https://escandalia.vercel.app/
 
 Importante: no compartir ni guardar en el repositorio la `service_role key`.
 
-## Como editar
+## Cómo editar
 
-Clonar el repositorio con GitHub Desktop, hacer cambios, commit y push a `main`. Vercel redespliega automaticamente.
+Clonar el repositorio con GitHub Desktop, hacer cambios, commit y push a `main`. Vercel redespliega automáticamente.
