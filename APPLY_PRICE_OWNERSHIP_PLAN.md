@@ -81,6 +81,8 @@ Motivo:
 - Hacer que cualquier llamada legacy a `applyRecommendedPrice()` delegue en esa funcion unica, sin duplicar logica.
 - Mantener `updateDishWithFormats(dish)` como dependencia de persistencia, no como propietario de la accion.
 
+Estado: implementada en `sprint3/apply-price-handler-unification`. `apply-price-action.js` contiene `applyRecommendedPriceFromCurrentContext()`, el listener actual delega en ella y las implementaciones legacy conservan fallback pero delegan en la funcion unica cuando esta disponible.
+
 ### Fase C: eliminar duplicados
 
 - Retirar las implementaciones duplicadas o dejarlas como wrappers temporales minimos.

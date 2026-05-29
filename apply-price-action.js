@@ -1,16 +1,7 @@
 // Ownership note: this file is the planned single owner for the
 // "apply recommended price" flow. Current duplicated implementations in other
 // files are delegation candidates until Phase B/C remove the overlap.
-document.addEventListener('click', async (event) => {
-  const button = event.target.closest('button');
-  if (!button) return;
-
-  const label = button.textContent.trim();
-  if (label !== 'Aplicar nuevo precio' && label !== 'Aplicar precios sugeridos') return;
-
-  event.preventDefault();
-  event.stopImmediatePropagation();
-
+async function applyRecommendedPriceFromCurrentContext() {
   const dish = oilAlert().affected[0]?.dish || selectedDish?.();
   if (!dish) {
     showSync?.('No encuentro el plato para actualizar');
@@ -42,4 +33,17 @@ document.addEventListener('click', async (event) => {
     console.error(error);
     showSync?.('No se pudo guardar el nuevo precio');
   }
+}
+
+document.addEventListener('click', async (event) => {
+  const button = event.target.closest('button');
+  if (!button) return;
+
+  const label = button.textContent.trim();
+  if (label !== 'Aplicar nuevo precio' && label !== 'Aplicar precios sugeridos') return;
+
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  await applyRecommendedPriceFromCurrentContext();
 }, true);
