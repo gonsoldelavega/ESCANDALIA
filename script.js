@@ -192,6 +192,9 @@ async function createDishFromForm() {
 async function applyRecommendedPrice() {
   // Deprecated/delegation candidate: apply-price-action.js is the planned owner
   // for the full apply recommended price flow.
+  if (typeof applyRecommendedPriceFromCurrentContext === "function") {
+    return applyRecommendedPriceFromCurrentContext();
+  }
   const dish = oilAlert().affected[0]?.dish || selectedDish(); if (!dish) return;
   dish.pvp = suggestedPrice(dish); selectedDishId = dish.id;
   if (useSupabase && session) await supabase.from("dishes").update({ pvp: dish.pvp }).eq("id", dish.id);
