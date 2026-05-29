@@ -75,6 +75,8 @@ saveRecipeQuantities = async function saveRecipeQuantitiesWithFormats() {
 };
 
 applyRecommendedPrice = async function applyRecommendedPriceWithFormats() {
+  // Deprecated/delegation candidate: apply-price-action.js is the planned owner
+  // for the full apply recommended price flow.
   const dish = oilAlert().affected[0]?.dish || selectedDish();
   if (!dish) return;
   ensureDishFormats(dish);

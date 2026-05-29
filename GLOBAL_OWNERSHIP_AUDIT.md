@@ -50,6 +50,8 @@
 4. `renderRecipeEditor` / `saveRecipeQuantities` / `updateDishWithFormats`: editor, rendimiento, formatos y persistencia estan repartidos.
 5. Orden de carga: `start()` se ejecuta en `script.js` antes de cargar los patches posteriores, y el comportamiento final depende de timing y wrappers.
 
+Nota: el plan especifico para consolidar el ownership de aplicar precio esta documentado en `APPLY_PRICE_OWNERSHIP_PLAN.md`.
+
 ## 5. Sprint 3.4 recomendado
 
 1. Documentar ownership global en este archivo y mantenerlo como referencia del sprint.
