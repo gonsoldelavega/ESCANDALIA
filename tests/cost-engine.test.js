@@ -239,6 +239,83 @@ test('slugify: "Gambas al ajillo" → "gambas-al-ajillo"', () => {
   assert(slugify('Gambas al ajillo'), 'gambas-al-ajillo');
 });
 
+// --- Test 16: casos criticos Sprint 3 ---
+test('suggestedPrice: target=1 no devuelve Infinity', () => {
+  const price = suggestedPrice(tortilla, 1);
+  if (!Number.isFinite(price)) throw new Error(`esperado precio finito, recibido ${price}`);
+});
+
+test('suggestedPrice: target>1 no devuelve Infinity', () => {
+  const price = suggestedPrice(tortilla, 1.2);
+  if (!Number.isFinite(price)) throw new Error(`esperado precio finito, recibido ${price}`);
+});
+
+test('suggestedPrice: target<=0 usa margen minimo seguro', () => {
+  assertClose(suggestedPrice(tortilla, 0), 0.70, 0.01);
+  assertClose(suggestedPrice(tortilla, -0.2), 0.70, 0.01);
+});
+
+test('ingredientCost: ingrediente inexistente en receta cuesta 0', () => {
+  assert(ingredientCost({ ingredient: 'ing_no_existe', qty: 200 }), 0);
+});
+
+test('formatCost: portions=0 usa fallback 1', () => {
+  assert(formatCost(tortilla, { portions: 0, pvp: 3 }), unitCost(tortilla));
+});
+
+test('formatCost: portions negativo usa fallback 1', () => {
+  assert(formatCost(tortilla, { portions: -2, pvp: 3 }), unitCost(tortilla));
+});
+
+test('formatCost: portions string numerico se respeta', () => {
+  assert(formatCost(tortilla, { portions: '2.5', pvp: 6.6 }), unitCost(tortilla) * 2.5);
+});
+
+test('defaultFormats: dish.formats vacio devuelve formatos por defecto', () => {
+  const formats = defaultFormats({ ...tortilla, formats: [] });
+  assert(formats[0].id, 'tapa');
+  assert(formats.length, 3);
+});
+
+test('defaultFormats: dish.formats malformado se normaliza', () => {
+  const formats = defaultFormats({ ...tortilla, formats: [{ portions: -3, pvp: 'abc' }] });
+  assert(formats[0].id, 'format-1');
+  assert(formats[0].portions, 1);
+  assert(formats[0].pvp, 0);
+});
+
+test('primaryFormat: dish null devuelve formato seguro', () => {
+  const format = primaryFormat(null);
+  assert(format.id, 'tapa');
+  assert(format.portions, 1);
+  assert(format.pvp, 0);
+});
+
+test('slugify: tildes reales Jamón, Atún, Ñ', () => {
+  assert(slugify('Jamón y Atún Ñ'), 'jamon-y-atun-n');
+});
+
+test('numberFromInput: simbolo euro real y espacios', () => {
+  assert(numberFromInput(' 1,50 € '), 1.5);
+});
+
+test('numberFromInput: formato espanol 1.234,56', () => {
+  assert(numberFromInput('1.234,56'), 1234.56);
+});
+
+test('currency: soporta negativos', () => {
+  assert(currency(-1.2), '-1,20€');
+});
+
+test('formatMargin: margen negativo cuando coste supera PVP', () => {
+  const margin = formatMargin(gambas, { portions: 1, pvp: 1 });
+  if (margin >= 0) throw new Error(`esperado margen negativo, recibido ${margin}`);
+});
+
+test('formatMargin: PVP cero devuelve 0', () => {
+  assert(formatMargin(tortilla, { portions: 1, pvp: 0 }), 0);
+});
+
 // ============================================================
 // 4. Resultados
 // ============================================================

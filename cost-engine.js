@@ -15,7 +15,8 @@ function baseRecipeCost(dish, mode = 'current') {
 
 /** Coste de una línea de ingrediente */
 function ingredientCost(line, mode = 'current') {
-  return (ingredients[line.ingredient]?.[mode] || 0) * line.qty;
+  const qty = Number(line?.qty) || 0;
+  return (ingredients[line?.ingredient]?.[mode] || 0) * qty;
 }
 
 /** Coste unitario por ración */
@@ -35,7 +36,8 @@ function dishMargin(dish, mode = 'current') {
 
 /** Coste de un formato específico (tapa, media, ración) */
 function formatCost(dish, format, mode = 'current') {
-  return unitCost(dish, mode) * (Number(format?.portions) || 1);
+  const portions = Number(format?.portions);
+  return unitCost(dish, mode) * (Number.isFinite(portions) && portions > 0 ? portions : 1);
 }
 
 /** Margen de un formato específico (0..1) */
@@ -48,7 +50,9 @@ function formatMargin(dish, format, mode = 'current') {
 /** Precio de venta sugerido para alcanzar un margen objetivo */
 function suggestedPrice(dish, target = business?.targetMargin || 0.75, format = primaryFormat(dish)) {
   const cost = formatCost(dish, format);
-  return Math.ceil((cost / (1 - target)) * 20) / 20;
+  const rawTarget = Number(target);
+  const safeTarget = Number.isFinite(rawTarget) ? Math.min(Math.max(rawTarget, 0), 0.95) : 0.75;
+  return Math.ceil((cost / (1 - safeTarget)) * 20) / 20;
 }
 
 /** Número de raciones (mínimo 1) */
@@ -87,7 +91,17 @@ function marginClass(margin) {
 /** Formatos por defecto de un plato */
 function defaultFormats(dish) {
   const basePvp = Number(dish?.pvp) || 0;
-  if (Array.isArray(dish?.formats) && dish.formats.length) return dish.formats;
+  if (Array.isArray(dish?.formats) && dish.formats.length) {
+    return dish.formats.map((format, index) => {
+      const portions = Number(format?.portions);
+      return {
+        id: format?.id || `format-${index + 1}`,
+        name: format?.name || `Formato ${index + 1}`,
+        portions: Number.isFinite(portions) && portions > 0 ? portions : 1,
+        pvp: roundMoney(format?.pvp),
+      };
+    });
+  }
   return [
     { id: 'tapa', name: 'Tapa', portions: 1, pvp: basePvp },
     { id: 'media', name: 'Media racion', portions: 2.5, pvp: roundMoney(basePvp * 2.2) },
@@ -102,9 +116,25 @@ function primaryFormat(dish) {
 
 /** Slugify: normaliza texto para IDs */
 function slugify(value) {
-  return value.toLowerCase()
+  return String(value || '').toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
+
+numberFromInput = function numberFromInput(value, fallback = 0) {
+  const normalized = String(value || '')
+    .trim()
+    .replace(/€|â‚¬/g, '')
+    .replace(/\s/g, '');
+  const decimalValue = normalized.includes(',')
+    ? normalized.replace(/\./g, '').replace(',', '.')
+    : normalized;
+  const parsed = Number(decimalValue);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+currency = function currency(value) {
+  return `${Number(value || 0).toFixed(2).replace('.', ',')}€`;
+};
