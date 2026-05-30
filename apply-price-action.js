@@ -40,7 +40,9 @@ document.addEventListener('click', async (event) => {
   if (!button) return;
 
   const label = button.textContent.trim();
-  if (label !== 'Aplicar nuevo precio' && label !== 'Aplicar precios sugeridos') return;
+  const isApplyPriceAction = button.dataset.action === 'apply-recommended-price';
+  const isLegacyApplyPriceLabel = label === 'Aplicar nuevo precio' || label === 'Aplicar precios sugeridos';
+  if (!isApplyPriceAction && !isLegacyApplyPriceLabel) return;
 
   event.preventDefault();
   event.stopImmediatePropagation();

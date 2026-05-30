@@ -89,6 +89,8 @@ Estado: implementada en `sprint3/apply-price-handler-unification`. `apply-price-
 - Sustituir deteccion por texto visible por `data-action="apply-recommended-price"` cuando se permita tocar HTML.
 - Eliminar `stopImmediatePropagation` solo cuando el router unico este preparado para no duplicar acciones.
 
+Estado: iniciada en `sprint3/apply-price-data-action`. Los botones principales usan `data-action`, los handlers priorizan `data-action` y mantienen fallback por texto visible durante la transicion.
+
 ## 8. Manual checks necesarios
 
 - `node tests/cost-engine.test.js`.

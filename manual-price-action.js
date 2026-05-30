@@ -1,7 +1,9 @@
 document.addEventListener('click', (event) => {
   const button = event.target.closest('button');
   if (!button) return;
-  if (button.textContent.trim() !== 'Editar manualmente') return;
+  const isManualPriceAction = button.dataset.action === 'edit-price-manually';
+  const isLegacyManualPriceLabel = button.textContent.trim() === 'Editar manualmente';
+  if (!isManualPriceAction && !isLegacyManualPriceLabel) return;
   event.preventDefault();
   event.stopImmediatePropagation();
   const dish = oilAlert().affected[0]?.dish || selectedDish?.();
