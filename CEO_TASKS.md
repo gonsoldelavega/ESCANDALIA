@@ -77,16 +77,17 @@ notes: Primera version del canal operativo. No contiene cambios funcionales.
 ## Codex report
 
 ```yaml
-status: in_progress
+status: done
 branch: codex/ceo-tasks-protocol
 commits:
-  - pending
+  - "2e09533 docs: add CEO task coordination protocol"
+  - "docs: update CEO task report with PR link"
 files_modified:
   - CEO_TASKS.md
 tests:
-  - "git status --short: pending"
-pr: pending
+  - "git status --short: only CEO_TASKS.md modified before final report commit"
+pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/8"
 risks:
   - "Documento operativo nuevo: requiere disciplina de lectura al iniciar cada bloque."
-next_step: "Abrir PR draft y actualizar este reporte con enlace real."
+next_step: "ChatGPT CEO puede editar Active block para el siguiente bloque; Codex CTO leera este archivo antes de ejecutar."
 ```
