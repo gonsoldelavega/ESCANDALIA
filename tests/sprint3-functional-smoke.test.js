@@ -153,6 +153,28 @@ test('mobile shell is constrained for 375px and 430px checks', () => {
   assertIncludes('styles', 'width:min(100vw,430px)');
 });
 
+test('escandallos overview copy exists', () => {
+  assertIncludes('index', 'aria-label="Escandallos"');
+  assertIncludes('index', 'Ordenado por prioridad de revisión');
+  assertIncludes('productActions', 'Margen estimado');
+  assertIncludes('productActions', 'Food cost');
+  assertIncludes('productActions', 'Revisar precio');
+  assertIncludes('productActions', 'Ver detalle');
+});
+
+test('escandallos overview uses existing cost helpers and margin badges', () => {
+  assertIncludes('productActions', 'function renderEscandallosOverview()');
+  assertIncludes('productActions', 'rows = [...dishes].sort');
+  assertIncludes('productActions', 'formatCost(dish, format)');
+  assertIncludes('productActions', 'formatMargin(dish, format)');
+  assertIncludes('productActions', 'marginClass(margin)');
+  assertIncludes('productActions', "if (typeof renderAll === 'function') renderAll();");
+  assertIncludes('styles', '.escandallo-card.low-bg');
+  assertIncludes('styles', '.escandallo-card.mid-bg');
+  assertIncludes('styles', '.escandallo-card.good-bg');
+  assertIncludes('styles', '.escandallo-actions{display:grid;grid-template-columns:1fr');
+});
+
 console.log('--------------------------------------------------');
 console.log(`${passed} passed, ${failed} failed`);
 

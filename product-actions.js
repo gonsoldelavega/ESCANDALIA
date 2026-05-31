@@ -90,6 +90,32 @@ function prepareEmptyDishForm() {
   if (summary) summary.innerHTML = `<span>Coste receta</span><strong>0,00€</strong><span>Coste por tapa</span><strong class="good-text">--</strong>`;
 }
 
+function escandalloBadgeLabel(margin) {
+  if (margin >= 0.7) return 'Margen bueno';
+  if (margin >= 0.62) return 'Margen medio';
+  return 'Margen bajo';
+}
+
+function renderEscandallosOverview() {
+  const list = document.querySelector('.escandallos-list');
+  if (!list) return;
+  const rows = [...dishes].sort((a, b) => dishMargin(a) - dishMargin(b));
+  if (!rows.length) {
+    list.innerHTML = '<div class="empty-note">Sin datos. Añade platos para ver escandallos.</div>';
+    return;
+  }
+  list.innerHTML = rows.map((dish) => {
+    const format = primaryFormat(dish);
+    const cost = formatCost(dish, format);
+    const pvp = Number(format.pvp) || 0;
+    const margin = formatMargin(dish, format);
+    const foodCost = pvp > 0 ? cost / pvp : 0;
+    const hasRecipe = Boolean(dish.recipe?.length);
+    const badgeClass = marginClass(margin);
+    return `<article class="escandallo-card ${badgeClass}" data-dish-id="${dish.id}"><div class="escandallo-main"><span class="escandallo-kicker">${hasRecipe ? escandalloBadgeLabel(margin) : 'Pendiente de receta'}</span><h3>${dish.name}</h3><p>Coste del plato <b>${hasRecipe ? currency(cost) : 'Sin datos'}</b> · PVP actual <b>${currency(pvp)}</b></p></div><div class="escandallo-metrics"><div><span>Margen estimado</span><strong>${hasRecipe ? percent(margin) : '--'}</strong></div><div><span>Food cost</span><strong>${hasRecipe && pvp > 0 ? percent(foodCost) : '--'}</strong></div></div><div class="escandallo-actions"><button class="secondary-button compact-action" type="button" data-go="dish-detail" data-dish-id="${dish.id}">Ver detalle</button><button class="primary-button compact-action" type="button" data-go="ai-price" data-dish-id="${dish.id}">Revisar precio</button></div></article>`;
+  }).join('');
+}
+
 renderHome = function patchedRenderHome() {
   const margins = dishes.map((dish) => dishMargin(dish));
   const averageMargin = margins.length ? margins.reduce((sum, item) => sum + item, 0) / margins.length : 0;
@@ -104,6 +130,7 @@ renderHome = function patchedRenderHome() {
     const format = primaryFormat(dish);
     return `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>${format.name}: coste <b>${currency(formatCost(dish, format))}</b> · PVP ${currency(format.pvp)}</p><small>Receta base: ${yieldCount(dish)} tapas</small></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`;
   }).join('');
+  renderEscandallosOverview();
 };
 
 renderDetail = function patchedRenderDetail() {
@@ -289,3 +316,5 @@ document.addEventListener('click', async (event) => {
   if (isReviewCostsAction) { event.preventDefault(); event.stopImmediatePropagation(); showScreen('ingredient-costs'); return; }
   if (isSaveRecipeAction && document.querySelector('[data-screen="edit-recipe"].is-active')) { event.preventDefault(); event.stopImmediatePropagation(); await saveRecipeQuantities(); return; }
 }, true);
+
+if (typeof renderAll === 'function') renderAll();
