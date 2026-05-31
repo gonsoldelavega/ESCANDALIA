@@ -111,7 +111,7 @@ tests:
   - "node tests/cost-engine.test.js -> 46 passed, 0 failed"
   - "node tests/sprint3-functional-smoke.test.js -> 16 passed, 0 failed"
   - "node --check product-actions.js -> passed"
-pr: pending
+pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/12"
 risks:
   - "Vista anadida dentro del home para evitar tocar router global."
   - "CTAs reutilizan data-go existente hacia detalle y precio."
