@@ -316,3 +316,5 @@ document.addEventListener('click', async (event) => {
   if (isReviewCostsAction) { event.preventDefault(); event.stopImmediatePropagation(); showScreen('ingredient-costs'); return; }
   if (isSaveRecipeAction && document.querySelector('[data-screen="edit-recipe"].is-active')) { event.preventDefault(); event.stopImmediatePropagation(); await saveRecipeQuantities(); return; }
 }, true);
+
+if (typeof renderAll === 'function') renderAll();

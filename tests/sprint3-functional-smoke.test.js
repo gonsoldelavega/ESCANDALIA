@@ -168,9 +168,11 @@ test('escandallos overview uses existing cost helpers and margin badges', () => 
   assertIncludes('productActions', 'formatCost(dish, format)');
   assertIncludes('productActions', 'formatMargin(dish, format)');
   assertIncludes('productActions', 'marginClass(margin)');
+  assertIncludes('productActions', "if (typeof renderAll === 'function') renderAll();");
   assertIncludes('styles', '.escandallo-card.low-bg');
   assertIncludes('styles', '.escandallo-card.mid-bg');
   assertIncludes('styles', '.escandallo-card.good-bg');
+  assertIncludes('styles', '.escandallo-actions{display:grid;grid-template-columns:1fr');
 });
 
 console.log('--------------------------------------------------');
