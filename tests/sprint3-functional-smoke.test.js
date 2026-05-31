@@ -156,19 +156,35 @@ test('mobile shell is constrained for 375px and 430px checks', () => {
 test('escandallos overview copy exists', () => {
   assertIncludes('index', 'aria-label="Escandallos"');
   assertIncludes('index', 'Ordenado por prioridad de revisión');
+  assertIncludes('productActions', 'platos a revisar');
+  assertIncludes('productActions', 'Revisar estos platos primero');
+  assertIncludes('productActions', 'margen medio estimado');
   assertIncludes('productActions', 'Margen estimado');
   assertIncludes('productActions', 'Food cost');
   assertIncludes('productActions', 'Revisar precio');
   assertIncludes('productActions', 'Ver detalle');
 });
 
+test('escandallos overview exposes margin filters', () => {
+  assertIncludes('productActions', "['all', 'Todos']");
+  assertIncludes('productActions', "['low', 'Margen bajo']");
+  assertIncludes('productActions', "['mid', 'Margen medio']");
+  assertIncludes('productActions', "['good', 'Margen bueno']");
+  assertIncludes('productActions', 'data-escandallo-filter');
+  assertIncludes('productActions', "escandallosFilter = escandalloFilter.dataset.escandalloFilter || 'all'");
+  assertIncludes('styles', '.escandallos-filters button.is-active');
+});
+
 test('escandallos overview uses existing cost helpers and margin badges', () => {
   assertIncludes('productActions', 'function renderEscandallosOverview()');
-  assertIncludes('productActions', 'rows = [...dishes].sort');
+  assertIncludes('productActions', 'rows = [...dishes].map');
+  assertIncludes('productActions', '.sort((a, b) => a.margin - b.margin)');
   assertIncludes('productActions', 'formatCost(dish, format)');
   assertIncludes('productActions', 'formatMargin(dish, format)');
   assertIncludes('productActions', 'marginClass(margin)');
   assertIncludes('productActions', "if (typeof renderAll === 'function') renderAll();");
+  assertIncludes('productActions', 'function escandalloState(margin)');
+  assertIncludes('styles', '.escandallos-summary');
   assertIncludes('styles', '.escandallo-card.low-bg');
   assertIncludes('styles', '.escandallo-card.mid-bg');
   assertIncludes('styles', '.escandallo-card.good-bg');
