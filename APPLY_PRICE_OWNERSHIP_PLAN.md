@@ -13,9 +13,9 @@
 
 | Elemento | Archivo | Rol actual |
 | --- | --- | --- |
-| `applyRecommendedPrice` base | `script.js` | Calcula `suggestedPrice(dish)`, actualiza `dish.pvp`, persiste `pvp` simple y renderiza. |
-| `applyRecommendedPrice` patch | `product-actions.js` | Sobrescribe la base, asegura formatos y actualiza `dish.formats[0].pvp` y `dish.pvp`. |
-| `applyRecommendedPrice` con formatos | `yield-persistence.js` | Sobrescribe otra vez, usa `updateDishWithFormats(dish)` para persistir formatos. |
+| `applyRecommendedPrice` base | `script.js` | Delegador legacy con fallback base para carga inicial. |
+| `applyRecommendedPrice` patch | `product-actions.js` | Delegador legacy; llama al propietario si existe y si no delega al wrapper previo. |
+| `applyRecommendedPrice` con formatos | `yield-persistence.js` | Delegador legacy final; llama al propietario si existe y conserva el unico fallback rico con `updateDishWithFormats(dish)`. |
 | Listener de aplicar precio | `apply-price-action.js` | Intercepta clicks en captura para `Aplicar nuevo precio` y `Aplicar precios sugeridos`. |
 | Listener manual | `manual-price-action.js` | Intercepta `Editar manualmente`; no aplica precio, pero compite en la misma pantalla. |
 | Botones origen | `index.html` | Botones con texto visible, sin `data-action` especifico. |
@@ -44,7 +44,7 @@
 
 ## 5. Riesgos concretos
 
-- Triple implementacion: hay tres versiones de `applyRecommendedPrice`, pero el flujo real vive en un listener aparte.
+- Legacy residual: hay tres puntos `applyRecommendedPrice`, pero ahora funcionan como delegadores/fallbacks y el flujo real vive en `apply-price-action.js`.
 - Ownership confuso: leer la funcion global no explica lo que ocurre en produccion.
 - Dependencia de microcopy: el handler detecta botones por texto visible.
 - Riesgo de plato equivocado: `oilAlert().affected[0]` puede tener prioridad sobre el plato que el usuario cree estar editando.
@@ -90,6 +90,15 @@ Estado: implementada en `sprint3/apply-price-handler-unification`. `apply-price-
 - Eliminar `stopImmediatePropagation` solo cuando el router unico este preparado para no duplicar acciones.
 
 Estado: iniciada en `sprint3/apply-price-data-action`. Los botones principales usan `data-action`, los handlers priorizan `data-action` y mantienen fallback por texto visible durante la transicion.
+
+### Fase D: limpieza legacy conservadora
+
+- `apply-price-action.js` se mantiene como propietario operativo del flujo.
+- `product-actions.js` ya no duplica la logica de aplicar precio; conserva un delegador legacy que llama al propietario si existe y, si no, delega al wrapper previo por orden de carga.
+- `yield-persistence.js` conserva el ultimo fallback rico para escenarios donde el propietario no este disponible, porque es el punto que conoce `updateDishWithFormats(dish)` tras cargarse la persistencia de formatos.
+- `script.js` mantiene su fallback base por compatibilidad de carga inicial.
+- `stopImmediatePropagation` se conserva mientras el router global siga detectando botones por texto visible.
+- `tests/sprint3-functional-smoke.test.js` cubre `data-action`, propietario y delegadores legacy.
 
 ## 8. Manual checks necesarios
 

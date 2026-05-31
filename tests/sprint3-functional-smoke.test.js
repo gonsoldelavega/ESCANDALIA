@@ -23,6 +23,8 @@ const files = {
   styles: read('styles.css'),
   applyPrice: read('apply-price-action.js'),
   manualPrice: read('manual-price-action.js'),
+  productActions: read('product-actions.js'),
+  yieldPersistence: read('yield-persistence.js'),
   opsActions: read('ops-actions.js'),
 };
 
@@ -93,9 +95,19 @@ test('manual edit button uses data-action', () => {
 });
 
 test('apply price handler prioritizes data-action and keeps legacy fallback', () => {
+  assertIncludes('applyPrice', 'function applyRecommendedPriceFromCurrentContext()');
   assertOrdered('applyPrice', "button.dataset.action === 'apply-recommended-price'", "label === 'Aplicar nuevo precio'");
   assertIncludes('applyPrice', "label === 'Aplicar precios sugeridos'");
   assertIncludes('applyPrice', 'stopImmediatePropagation');
+});
+
+test('legacy apply price wrappers delegate to the owner when available', () => {
+  assertIncludes('script', 'typeof applyRecommendedPriceFromCurrentContext === "function"');
+  assertIncludes('productActions', 'previousApplyRecommendedPriceForProductActions');
+  assertIncludes('productActions', 'return applyRecommendedPriceFromCurrentContext()');
+  assertIncludes('productActions', 'return previousApplyRecommendedPriceForProductActions()');
+  assertIncludes('yieldPersistence', 'previousApplyRecommendedPriceForYieldPersistence');
+  assertIncludes('yieldPersistence', 'return applyRecommendedPriceFromCurrentContext()');
 });
 
 test('manual price handler prioritizes data-action and keeps legacy fallback', () => {

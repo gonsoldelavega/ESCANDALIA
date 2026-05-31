@@ -237,19 +237,14 @@ createDishFromForm = async function createBlankDishFromForm() {
   showSync?.('Plato creado. Ahora añade la receta base.');
 };
 
+const previousApplyRecommendedPriceForProductActions = applyRecommendedPrice;
 applyRecommendedPrice = async function patchedApplyRecommendedPrice() {
-  // Deprecated/delegation candidate: apply-price-action.js is the planned owner
-  // for the full apply recommended price flow.
+  // Legacy delegator: apply-price-action.js owns the real user action.
+  // Keep this wrapper for older callers and load-order fallback only.
   if (typeof applyRecommendedPriceFromCurrentContext === 'function') {
     return applyRecommendedPriceFromCurrentContext();
   }
-  const dish = oilAlert().affected[0]?.dish || selectedDish(); if (!dish) return;
-  ensureDishFormats(dish);
-  dish.formats[0].pvp = suggestedPrice(dish, business.targetMargin, dish.formats[0]);
-  dish.pvp = dish.formats[0].pvp;
-  selectedDishId = dish.id;
-  if (useSupabase && session) await supabase.from('dishes').update({ pvp: dish.pvp }).eq('id', dish.id);
-  renderAll(); showSync('Precio actualizado');
+  return previousApplyRecommendedPriceForProductActions();
 };
 
 ensureProductScreens();
