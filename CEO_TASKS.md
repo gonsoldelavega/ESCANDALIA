@@ -41,10 +41,18 @@ Codex CTO debe:
 ## Active block
 
 ```yaml
-id: ceo-tasks-protocol
+id: sprint3-8-apply-price-legacy-cleanup
 status: active
-objective: Crear este archivo como canal de coordinacion operativo entre ChatGPT CEO y Codex CTO.
+objective: Reducir duplicacion legacy del flujo applyRecommendedPrice despues de introducir propietario unico operativo en apply-price-action.js.
 scope:
+  - apply-price-action.js
+  - script.js
+  - product-actions.js
+  - yield-persistence.js
+  - manual-price-action.js
+  - index.html
+  - tests/sprint3-functional-smoke.test.js
+  - APPLY_PRICE_OWNERSHIP_PLAN.md
   - CEO_TASKS.md
 out_of_scope:
   - Supabase/RLS
@@ -54,16 +62,29 @@ out_of_scope:
   - dependencias
   - framework
   - Carta QR
-  - logica de negocio
+  - Stripe
+  - calculo suggestedPrice
+  - microcopy visible
+  - refactor grande del router global
 tasks:
-  - Crear CEO_TASKS.md con protocolo de trabajo.
-  - Documentar como ChatGPT CEO debe definir el bloque activo.
-  - Documentar como Codex CTO debe reportar el resultado.
-  - Crear rama, commit, push y PR.
+  - Auditar implementaciones legacy de applyRecommendedPrice.
+  - Determinar si pueden eliminarse o reducirse sin romper orden de carga.
+  - Implementar el minimo seguro.
+  - Mantener compatibilidad y fallback por texto si sigue siendo necesario.
+  - Ajustar smoke tests si cubren el cambio.
+  - Actualizar documentacion del estado del flujo.
+  - Ejecutar gates.
+  - Commit, push y PR.
 checks:
-  - git status --short
+  - node tests/cost-engine.test.js
+  - node tests/sprint3-functional-smoke.test.js
+  - node --check apply-price-action.js
+  - node --check manual-price-action.js
+  - node --check script.js
+  - node --check product-actions.js
+  - node --check yield-persistence.js
 merge_policy: No hacer merge a main.
-notes: Primera version del canal operativo. No contiene cambios funcionales.
+notes: Si eliminar legacy no es seguro, mantener delegadores minimos y documentar por que.
 ```
 
 ## Backlog
@@ -77,17 +98,29 @@ notes: Primera version del canal operativo. No contiene cambios funcionales.
 ## Codex report
 
 ```yaml
-status: done
-branch: codex/ceo-tasks-protocol
+status: in_progress
+branch: codex/sprint3-8-apply-price-legacy-cleanup
 commits:
-  - "2e09533 docs: add CEO task coordination protocol"
-  - "docs: update CEO task report with PR link"
+  - "pending: refactor: reduce apply price legacy handlers"
 files_modified:
   - CEO_TASKS.md
+  - APPLY_PRICE_OWNERSHIP_PLAN.md
+  - product-actions.js
+  - tests/sprint3-functional-smoke.test.js
+  - yield-persistence.js
 tests:
-  - "git status --short: only CEO_TASKS.md modified before final report commit"
-pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/8"
+  - "main preflight: node tests/cost-engine.test.js -> 46 passed, 0 failed"
+  - "main preflight: node tests/sprint3-functional-smoke.test.js -> 11 passed, 0 failed"
+  - "node tests/cost-engine.test.js -> 46 passed, 0 failed"
+  - "node tests/sprint3-functional-smoke.test.js -> 12 passed, 0 failed"
+  - "node --check apply-price-action.js -> passed"
+  - "node --check manual-price-action.js -> passed"
+  - "node --check script.js -> passed"
+  - "node --check product-actions.js -> passed"
+  - "node --check yield-persistence.js -> passed"
+pr: null
 risks:
-  - "Documento operativo nuevo: requiere disciplina de lectura al iniciar cada bloque."
-next_step: "ChatGPT CEO puede editar Active block para el siguiente bloque; Codex CTO leera este archivo antes de ejecutar."
+  - "script.js mantiene fallback base y deteccion por texto porque el router global aun no esta consolidado."
+  - "yield-persistence.js conserva el fallback rico para proteger escenarios donde el propietario no cargue."
+next_step: "Crear PR y validar en navegador real antes de retirar mas legacy."
 ```

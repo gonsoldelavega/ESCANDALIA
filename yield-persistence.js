@@ -74,14 +74,16 @@ saveRecipeQuantities = async function saveRecipeQuantitiesWithFormats() {
   showSync?.('Receta, rendimiento y formatos actualizados');
 };
 
+const previousApplyRecommendedPriceForYieldPersistence = applyRecommendedPrice;
 applyRecommendedPrice = async function applyRecommendedPriceWithFormats() {
-  // Deprecated/delegation candidate: apply-price-action.js is the planned owner
-  // for the full apply recommended price flow.
+  // Legacy delegator: apply-price-action.js owns the real user action.
+  // This final load-order wrapper keeps one rich fallback if the owner script
+  // is unavailable, then falls back to the previous wrapper if needed.
   if (typeof applyRecommendedPriceFromCurrentContext === 'function') {
     return applyRecommendedPriceFromCurrentContext();
   }
   const dish = oilAlert().affected[0]?.dish || selectedDish();
-  if (!dish) return;
+  if (!dish) return previousApplyRecommendedPriceForYieldPersistence();
   ensureDishFormats(dish);
   dish.formats[0].pvp = suggestedPrice(dish, business.targetMargin, dish.formats[0]);
   dish.pvp = dish.formats[0].pvp;
