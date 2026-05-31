@@ -109,7 +109,7 @@ tests:
   - "node tests/cost-engine.test.js -> 46 passed, 0 failed"
   - "node tests/sprint3-functional-smoke.test.js -> 17 passed, 0 failed"
   - "node --check product-actions.js -> passed"
-pr: pending
+pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/13"
 risks:
   - "No se toca router global ni navegacion inferior."
   - "Filtro implementado en el listener existente de product-actions.js."
