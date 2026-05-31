@@ -112,7 +112,7 @@ tests:
   - "main preflight: node tests/sprint3-functional-smoke.test.js -> 12 passed, 0 failed"
   - "node tests/cost-engine.test.js -> 46 passed, 0 failed"
   - "node tests/sprint3-functional-smoke.test.js -> 12 passed, 0 failed"
-pr: "pending"
+pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/10"
 risks:
   - "showScreen tiene wrappers encadenados en product-actions.js y ops-actions.js."
   - "setInterval sigue parcheando KPIs/nav en product-actions.js y ops-actions.js."
