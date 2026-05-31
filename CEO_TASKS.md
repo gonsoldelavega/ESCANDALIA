@@ -112,7 +112,7 @@ tests:
   - "node tests/sprint3-functional-smoke.test.js -> 14 passed, 0 failed"
   - "node --check script.js -> passed"
   - "node --check product-actions.js -> passed"
-pr: "pending"
+pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/11"
 risks:
   - "Fallback por texto se conserva durante la transicion."
   - "showScreen no se ha tocado."
