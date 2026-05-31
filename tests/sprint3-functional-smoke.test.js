@@ -1,0 +1,135 @@
+#!/usr/bin/env node
+/**
+ * Sprint 3.7 functional smoke checks.
+ *
+ * Static, dependency-free checks for critical UI flows before deleting legacy
+ * handlers or changing more globals.
+ *
+ * Run: node tests/sprint3-functional-smoke.test.js
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const root = path.resolve(__dirname, '..');
+
+function read(file) {
+  return fs.readFileSync(path.join(root, file), 'utf8');
+}
+
+const files = {
+  index: read('index.html'),
+  script: read('script.js'),
+  styles: read('styles.css'),
+  applyPrice: read('apply-price-action.js'),
+  manualPrice: read('manual-price-action.js'),
+  opsActions: read('ops-actions.js'),
+};
+
+let passed = 0;
+let failed = 0;
+
+function test(name, fn) {
+  try {
+    fn();
+    console.log(`  OK ${name}`);
+    passed += 1;
+  } catch (error) {
+    console.log(`  FAIL ${name}: ${error.message}`);
+    failed += 1;
+  }
+}
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function includes(file, text) {
+  return files[file].includes(text);
+}
+
+function indexOf(file, text) {
+  return files[file].indexOf(text);
+}
+
+function assertIncludes(file, text, label = text) {
+  assert(includes(file, text), `${file} missing ${label}`);
+}
+
+function assertOrdered(file, first, second) {
+  const firstIndex = indexOf(file, first);
+  const secondIndex = indexOf(file, second);
+  assert(firstIndex >= 0, `${file} missing ${first}`);
+  assert(secondIndex >= 0, `${file} missing ${second}`);
+  assert(firstIndex < secondIndex, `${file} expected ${first} before ${second}`);
+}
+
+console.log('\nSprint 3.7 functional smoke checks\n');
+console.log('--------------------------------------------------');
+
+test('base screens exist', () => {
+  ['home', 'dish-detail', 'ingredient-alert', 'ai-price', 'edit-recipe', 'add-dish'].forEach((screen) => {
+    assertIncludes('index', `data-screen="${screen}"`);
+  });
+});
+
+test('detail and home navigation anchors exist', () => {
+  assertIncludes('index', 'data-go="dish-detail"');
+  assertIncludes('index', 'data-go="home"');
+  assertIncludes('index', 'data-go="ai-price"');
+  assertIncludes('index', 'data-go="edit-recipe"');
+});
+
+test('apply new price button uses data-action', () => {
+  assertIncludes('index', 'data-action="apply-recommended-price">Aplicar nuevo precio');
+});
+
+test('apply suggested prices button uses data-action', () => {
+  assertIncludes('index', 'data-action="apply-recommended-price">Aplicar precios sugeridos');
+});
+
+test('manual edit button uses data-action', () => {
+  assertIncludes('index', 'data-action="edit-price-manually">Editar manualmente');
+});
+
+test('apply price handler prioritizes data-action and keeps legacy fallback', () => {
+  assertOrdered('applyPrice', "button.dataset.action === 'apply-recommended-price'", "label === 'Aplicar nuevo precio'");
+  assertIncludes('applyPrice', "label === 'Aplicar precios sugeridos'");
+  assertIncludes('applyPrice', 'stopImmediatePropagation');
+});
+
+test('manual price handler prioritizes data-action and keeps legacy fallback', () => {
+  assertOrdered('manualPrice', "button.dataset.action === 'edit-price-manually'", "button.textContent.trim() === 'Editar manualmente'");
+  assertIncludes('manualPrice', "showScreen('edit-recipe')");
+  assertIncludes('manualPrice', 'stopImmediatePropagation');
+});
+
+test('script order keeps legacy before focused handlers', () => {
+  assertOrdered('index', 'script.js', 'manual-price-action.js');
+  assertOrdered('index', 'manual-price-action.js', 'apply-price-action.js');
+});
+
+test('purchase and sales screens are dynamically declared', () => {
+  assertIncludes('opsActions', 'data-screen="purchases"');
+  assertIncludes('opsActions', 'data-screen="stats"');
+  assertIncludes('opsActions', 'data-go="purchases"');
+});
+
+test('purchase and sales save actions exist', () => {
+  assertIncludes('opsActions', '.save-purchase');
+  assertIncludes('opsActions', '.save-sale');
+  assertIncludes('opsActions', 'Compra registrada');
+  assertIncludes('opsActions', 'Ventas registradas');
+});
+
+test('mobile shell is constrained for 375px and 430px checks', () => {
+  assertIncludes('index', 'name="viewport"');
+  assertIncludes('styles', 'width:min(100vw,430px)');
+  assertIncludes('styles', '@media (max-width:374px)');
+  assertIncludes('styles', 'width:min(100vw,430px)');
+});
+
+console.log('--------------------------------------------------');
+console.log(`${passed} passed, ${failed} failed`);
+
+if (failed > 0) process.exit(1);
