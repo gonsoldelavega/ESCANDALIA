@@ -98,10 +98,11 @@ notes: Si eliminar legacy no es seguro, mantener delegadores minimos y documenta
 ## Codex report
 
 ```yaml
-status: in_progress
+status: done
 branch: codex/sprint3-8-apply-price-legacy-cleanup
 commits:
-  - "pending: refactor: reduce apply price legacy handlers"
+  - "e03dca4 refactor: reduce apply price legacy handlers"
+  - "docs: update sprint 3.8 Codex report"
 files_modified:
   - CEO_TASKS.md
   - APPLY_PRICE_OWNERSHIP_PLAN.md
@@ -118,9 +119,9 @@ tests:
   - "node --check script.js -> passed"
   - "node --check product-actions.js -> passed"
   - "node --check yield-persistence.js -> passed"
-pr: null
+pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/9"
 risks:
   - "script.js mantiene fallback base y deteccion por texto porque el router global aun no esta consolidado."
   - "yield-persistence.js conserva el fallback rico para proteger escenarios donde el propietario no cargue."
-next_step: "Crear PR y validar en navegador real antes de retirar mas legacy."
+next_step: "Revisar PR #9 y validar manualmente los flujos apply price antes de retirar mas legacy del router global."
 ```
