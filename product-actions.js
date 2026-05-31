@@ -283,6 +283,9 @@ document.addEventListener('click', async (event) => {
     return;
   }
   const manual = event.target.closest('button');
-  if (manual?.textContent.trim() === 'Revisar manualmente') { event.preventDefault(); event.stopImmediatePropagation(); showScreen('ingredient-costs'); return; }
-  if (manual?.textContent.trim() === 'Guardar cambios' && document.querySelector('[data-screen="edit-recipe"].is-active')) { event.preventDefault(); event.stopImmediatePropagation(); await saveRecipeQuantities(); return; }
+  const action = manual?.dataset.action;
+  const isReviewCostsAction = action === 'review-costs-manually' || manual?.textContent.trim() === 'Revisar manualmente';
+  const isSaveRecipeAction = action === 'save-recipe' || manual?.textContent.trim() === 'Guardar cambios';
+  if (isReviewCostsAction) { event.preventDefault(); event.stopImmediatePropagation(); showScreen('ingredient-costs'); return; }
+  if (isSaveRecipeAction && document.querySelector('[data-screen="edit-recipe"].is-active')) { event.preventDefault(); event.stopImmediatePropagation(); await saveRecipeQuantities(); return; }
 }, true);
