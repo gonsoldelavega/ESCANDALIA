@@ -42,7 +42,7 @@ Codex CTO debe:
 
 ```yaml
 id: sprint3-10-data-action-contracts
-status: active
+status: done
 objective: Anadir contratos data-action de bajo riesgo para acciones core que dependian de texto visible.
 scope:
   - index.html
@@ -88,6 +88,9 @@ notes: Cambio funcional acotado a contratos data-action con fallback legacy. No 
 ## Backlog
 
 ```yaml
+- id: sprint4-escandallos-overview
+  status: next
+  objective: Disenar e implementar la vista overview de escandallos sin continuar la linea de micro-refactors tecnicos.
 - id: sprint3-8-runtime-validation
   status: pending
   objective: Validar manualmente en navegador real los flujos criticos y preparar retirada controlada de handlers legacy por texto.
@@ -120,3 +123,7 @@ risks:
   - "listeners capture multiples siguen compitiendo antes del router base."
 next_step: "Validar preview y despues preparar retirada controlada de fallbacks por texto solo cuando el router este consolidado."
 ```
+
+## Technical line status
+
+La linea de micro-refactors tecnicos de Sprint 3 queda pausada tras Sprint 3.10. El siguiente bloque recomendado es Sprint 4 — Escandallos overview. No iniciar mas limpieza de router/listeners hasta nueva instruccion explicita.
