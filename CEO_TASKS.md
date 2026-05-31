@@ -41,18 +41,21 @@ Codex CTO debe:
 ## Active block
 
 ```yaml
-id: sprint3-8-apply-price-legacy-cleanup
+id: sprint3-9-router-listener-audit
 status: active
-objective: Reducir duplicacion legacy del flujo applyRecommendedPrice despues de introducir propietario unico operativo en apply-price-action.js.
+objective: Auditar router global, listeners, wrappers y parches setInterval antes de tocar comportamiento.
 scope:
-  - apply-price-action.js
   - script.js
   - product-actions.js
-  - yield-persistence.js
+  - ops-actions.js
+  - ops-editable.js
   - manual-price-action.js
+  - apply-price-action.js
+  - yield-persistence.js
   - index.html
   - tests/sprint3-functional-smoke.test.js
-  - APPLY_PRICE_OWNERSHIP_PLAN.md
+  - GLOBAL_OWNERSHIP_AUDIT.md
+  - SPRINT3_9_ROUTER_LISTENER_AUDIT.md
   - CEO_TASKS.md
 out_of_scope:
   - Supabase/RLS
@@ -63,28 +66,27 @@ out_of_scope:
   - framework
   - Carta QR
   - Stripe
+  - comportamiento funcional
+  - cambios en listeners
+  - cambios en showScreen
+  - eliminacion de setInterval
   - calculo suggestedPrice
   - microcopy visible
-  - refactor grande del router global
 tasks:
-  - Auditar implementaciones legacy de applyRecommendedPrice.
-  - Determinar si pueden eliminarse o reducirse sin romper orden de carga.
-  - Implementar el minimo seguro.
-  - Mantener compatibilidad y fallback por texto si sigue siendo necesario.
-  - Ajustar smoke tests si cubren el cambio.
-  - Actualizar documentacion del estado del flujo.
+  - Mapear listeners click con y sin capture.
+  - Mapear setInterval.
+  - Mapear wrappers showScreen/render.
+  - Mapear stopImmediatePropagation y dependencias por texto visible.
+  - Mapear acciones que ya usan data-action.
+  - Crear SPRINT3_9_ROUTER_LISTENER_AUDIT.md.
+  - Actualizar CEO_TASKS.md.
   - Ejecutar gates.
   - Commit, push y PR.
 checks:
   - node tests/cost-engine.test.js
   - node tests/sprint3-functional-smoke.test.js
-  - node --check apply-price-action.js
-  - node --check manual-price-action.js
-  - node --check script.js
-  - node --check product-actions.js
-  - node --check yield-persistence.js
 merge_policy: No hacer merge a main.
-notes: Si eliminar legacy no es seguro, mantener delegadores minimos y documentar por que.
+notes: Bloque documental. No modificar comportamiento funcional.
 ```
 
 ## Backlog
@@ -99,29 +101,22 @@ notes: Si eliminar legacy no es seguro, mantener delegadores minimos y documenta
 
 ```yaml
 status: done
-branch: codex/sprint3-8-apply-price-legacy-cleanup
+branch: codex/sprint3-9-router-listener-audit
 commits:
-  - "e03dca4 refactor: reduce apply price legacy handlers"
-  - "docs: update sprint 3.8 Codex report"
+  - "docs: audit global router and listener ownership"
 files_modified:
   - CEO_TASKS.md
-  - APPLY_PRICE_OWNERSHIP_PLAN.md
-  - product-actions.js
-  - tests/sprint3-functional-smoke.test.js
-  - yield-persistence.js
+  - SPRINT3_9_ROUTER_LISTENER_AUDIT.md
 tests:
   - "main preflight: node tests/cost-engine.test.js -> 46 passed, 0 failed"
-  - "main preflight: node tests/sprint3-functional-smoke.test.js -> 11 passed, 0 failed"
+  - "main preflight: node tests/sprint3-functional-smoke.test.js -> 12 passed, 0 failed"
   - "node tests/cost-engine.test.js -> 46 passed, 0 failed"
   - "node tests/sprint3-functional-smoke.test.js -> 12 passed, 0 failed"
-  - "node --check apply-price-action.js -> passed"
-  - "node --check manual-price-action.js -> passed"
-  - "node --check script.js -> passed"
-  - "node --check product-actions.js -> passed"
-  - "node --check yield-persistence.js -> passed"
-pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/9"
+pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/10"
 risks:
-  - "script.js mantiene fallback base y deteccion por texto porque el router global aun no esta consolidado."
-  - "yield-persistence.js conserva el fallback rico para proteger escenarios donde el propietario no cargue."
-next_step: "Revisar PR #9 y validar manualmente los flujos apply price antes de retirar mas legacy del router global."
+  - "showScreen tiene wrappers encadenados en product-actions.js y ops-actions.js."
+  - "setInterval sigue parcheando KPIs/nav en product-actions.js y ops-actions.js."
+  - "listeners capture multiples siguen compitiendo antes del router base."
+  - "varias acciones siguen dependiendo de texto visible."
+next_step: "Implementar un bloque pequeno de data-action para Guardar plato, Revisar manualmente y Guardar cambios, con fallback y smoke tests."
 ```
