@@ -2,6 +2,7 @@ let business = { name: "Bar El Rincón", slug: "barelrincón", ownerInitials: "J
 let ingredients = {};
 let dishes = [];
 let selectedDishId = "";
+let selectedIngredientId = "";
 let supabase = null;
 let session = null;
 let businessId = null;
@@ -26,12 +27,25 @@ const shell = document.querySelector(".phone-shell");
 
 /* slugify moved to cost-engine.js */
 function selectedDish() { return dishes.find((dish) => dish.id === selectedDishId) || dishes[0]; }
+function getCostAlerts() {
+  return Object.entries(ingredients)
+    .filter(([, ing]) => ing.before > 0 && ing.current > ing.before)
+    .map(([id, ing]) => {
+      const rise = (ing.current - ing.before) / ing.before;
+      const affected = dishes
+        .map((dish) => ({ dish, before: dishMargin(dish, "before"), current: dishMargin(dish), suggested: suggestedPrice(dish) }))
+        .filter((item) => item.dish.recipe.some((line) => line.ingredient === id) && item.current < business.targetMargin);
+      return { ingredientId: id, ingredient: ing, rise, affected };
+    })
+    .filter((a) => a.affected.length > 0)
+    .sort((a, b) => b.affected.length - a.affected.length);
+}
+
 function oilAlert() {
+  const alerts = getCostAlerts();
   const oilId = Object.keys(ingredients).find((id) => ingredients[id].name === "Aceite de oliva");
-  const oil = ingredients[oilId] || { current: 0, before: 0 };
-  const rise = oil.before ? (oil.current - oil.before) / oil.before : 0;
-  const affected = dishes.map((dish) => ({ dish, before: dishMargin(dish, "before"), current: dishMargin(dish), suggested: suggestedPrice(dish) })).filter((item) => item.dish.recipe.some((line) => line.ingredient === oilId) && item.current < 0.65);
-  return { rise, affected };
+  const entry = alerts.find((a) => a.ingredientId === oilId) || alerts[0];
+  return entry ? { rise: entry.rise, affected: entry.affected } : { rise: 0, affected: [] };
 }
 
 function showSync(message) {
@@ -153,17 +167,19 @@ function renderAll() {
   renderIngredientAlert();
   renderAiPrice();
   renderPublicMenu();
+  if (typeof renderIngredientList === "function") renderIngredientList();
+  if (typeof renderIngredientEdit === "function") renderIngredientEdit();
 }
 
 function showScreen(name) {
   renderAll();
   screens.forEach((screen) => screen.classList.toggle("is-active", screen.dataset.screen === name));
-  navButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.go === name));
-  const primaryScreens = ["home", "qr"];
+  const navTarget = { "add-dish": "dish-detail", "edit-recipe": "dish-detail", "ai-price": "dish-detail", "ingredient-edit": "ingredient-list", "ingredient-alert": "ingredient-list", "ingredient-costs": "ingredient-list" }[name] || name;
+  navButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.go === navTarget));
   const publicView = name === "public-menu";
-  nav.style.display = primaryScreens.includes(name) && !publicView ? "grid" : "none";
-  fab.style.display = primaryScreens.includes(name) && !publicView ? "block" : "none";
-  shell.classList.toggle("nav-hidden", !primaryScreens.includes(name) || publicView);
+  nav.style.display = publicView ? "none" : "grid";
+  fab.style.display = name === "home" ? "block" : "none";
+  shell.classList.toggle("nav-hidden", publicView);
   if (location.hash.slice(1) !== name) history.replaceState(null, "", `#${name}`);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -187,6 +203,22 @@ async function createDishFromForm() {
     const id = slugify(name); dishes.push({ id, name, category, servings, pvp, icon: "prawn", published: false, description: "", allergens: "Pendiente de revisar", recipe }); selectedDishId = id;
   }
   renderAll(); showSync("Plato guardado");
+}
+
+async function saveIngredientPrice(ingId, displayPrice) {
+  const ing = ingredients[ingId];
+  if (!ing) return;
+  const parsed = parseFloat(String(displayPrice).replace(",", "."));
+  if (isNaN(parsed) || parsed <= 0) return showSync("Introduce un precio válido");
+  const newPrice = (ing.unit === "g" || ing.unit === "ml") ? parsed / 1000 : parsed;
+  ing.before = ing.current;
+  ing.current = newPrice;
+  if (useSupabase && session) {
+    const { error } = await supabase.from("ingredients").update({ current_cost: newPrice, previous_cost: ing.before }).eq("id", ingId);
+    if (error) return showSync(error.message);
+  }
+  renderAll();
+  showSync(`${ing.name} actualizado`);
 }
 
 async function applyRecommendedPrice() {
@@ -217,9 +249,16 @@ document.addEventListener("click", async (event) => {
   const action = button?.dataset.action;
   if (action === "save-dish" || button?.textContent.trim() === "Guardar plato") await createDishFromForm();
   if (button?.textContent.trim() === "Aplicar nuevo precio" || button?.textContent.trim() === "Aplicar precios sugeridos") await applyRecommendedPrice();
+  if (action === "save-ingredient-price") {
+    const input = document.querySelector(".ing-price-input");
+    await saveIngredientPrice(selectedIngredientId, input?.value);
+    showScreen("ingredient-list");
+    return;
+  }
   const trigger = event.target.closest("[data-go]");
   if (!trigger) return;
   if (trigger.dataset.dishId) selectedDishId = trigger.dataset.dishId;
+  if (trigger.dataset.ingId) selectedIngredientId = trigger.dataset.ingId;
   showScreen(trigger.dataset.go);
 });
 

@@ -119,13 +119,20 @@ function renderEscandallosOverview() {
 renderHome = function patchedRenderHome() {
   const margins = dishes.map((dish) => dishMargin(dish));
   const averageMargin = margins.length ? margins.reduce((sum, item) => sum + item, 0) / margins.length : 0;
-  const alert = oilAlert();
+  const alerts = typeof getCostAlerts === "function" ? getCostAlerts() : [];
   document.querySelector('.avatar').textContent = business.ownerInitials;
   document.querySelector("[data-screen='home'] .hero h1").textContent = business.name;
   const kpis = document.querySelectorAll("[data-screen='home'] .kpi strong");
-  kpis[0].textContent = percent(averageMargin); kpis[1].textContent = dishes.length; kpis[2].textContent = alert.affected.length;
-  document.querySelector('.alert-card h2').textContent = `Aceite de oliva +${Math.round(alert.rise * 100)}%`;
-  document.querySelector('.alert-card p').textContent = `${alert.affected.length} formatos han bajado su margen por debajo del 65%`;
+  kpis[0].textContent = percent(averageMargin);
+  kpis[1].textContent = dishes.filter((d) => d.published !== false).length;
+  kpis[2].textContent = alerts.length;
+  kpis[2]?.closest('.kpi')?.classList.toggle('kpi-alert', alerts.length > 0);
+  const alertsList = document.querySelector('.alerts-list');
+  if (alertsList) {
+    alertsList.innerHTML = alerts.length === 0
+      ? '<div class="no-alerts"><span class="no-alerts-check">✓</span> Todo en orden · Sin alertas activas</div>'
+      : alerts.map((a) => `<article class="alert-card" role="button" tabindex="0" data-go="ingredient-alert" data-ing-id="${a.ingredientId}"><div class="food-icon olive"></div><div><h2>${a.ingredient.name} +${Math.round(a.rise * 100)}%</h2><p>${a.affected.length} plato${a.affected.length !== 1 ? "s" : ""} por debajo del margen objetivo</p></div></article>`).join('');
+  }
   document.querySelector('.dish-list').innerHTML = dishes.map((dish) => {
     const format = primaryFormat(dish);
     return `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>${format.name}: coste <b>${currency(formatCost(dish, format))}</b> · PVP ${currency(format.pvp)}</p><small>Receta base: ${yieldCount(dish)} tapas</small></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`;

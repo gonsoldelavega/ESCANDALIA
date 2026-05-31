@@ -46,14 +46,72 @@ function renderQr() {
   document.querySelector(".state-list").innerHTML = `<article><div class="state-icon check"></div><div><h3>${published.length} platos publicados</h3><p>Última actualización: hoy</p></div></article><article><div class="state-icon globe"></div><div><h3>Traducción IA activa</h3><p>Español · Inglés · Francés</p></div></article><article><div class="state-icon spark"></div><div><h3>${missingDescriptions} platos sin descripción</h3><p>La IA puede completarlos.</p></div></article>`;
 }
 
+function ingDisplayPrice(ing) {
+  if (ing.unit === "g") return `${currency(ing.current * 1000)}/kg`;
+  if (ing.unit === "ml") return `${currency(ing.current * 1000)}/L`;
+  return `${currency(ing.current)}/${ing.unit}`;
+}
+
+function ingDisplayUnit(ing) {
+  if (ing.unit === "g") return "kg";
+  if (ing.unit === "ml") return "L";
+  return ing.unit;
+}
+
 function renderIngredientAlert() {
-  const alert = oilAlert();
   const screen = document.querySelector("[data-screen='ingredient-alert']");
-  const oil = Object.values(ingredients).find((item) => item.name === "Aceite de oliva") || { before: 0, current: 0 };
-  screen.querySelector("h1").textContent = `Aceite de oliva +${Math.round(alert.rise * 100)}%`;
-  screen.querySelector(".impact-grid").innerHTML = `<div><span>Antes</span><b>${currency(oil.before * 1000)}/L</b></div><div><span>Ahora</span><b>${currency(oil.current * 1000)}/L</b></div><div><span>Impacto</span><b>${alert.affected.length} platos</b></div>`;
+  if (!screen) return;
+  const alerts = typeof getCostAlerts === "function" ? getCostAlerts() : [];
+  const ingId = typeof selectedIngredientId !== "undefined" ? selectedIngredientId : "";
+  const alert = alerts.find((a) => a.ingredientId === ingId) || alerts[0];
+  if (!alert) return;
+  const ing = alert.ingredient;
+  screen.querySelector("h1").textContent = `${ing.name} +${Math.round(alert.rise * 100)}%`;
+  screen.querySelector(".impact-grid").innerHTML = `<div><span>Antes</span><b>${ingDisplayPrice({ ...ing, current: ing.before })}</b></div><div><span>Ahora</span><b>${ingDisplayPrice(ing)}</b></div><div><span>Impacto</span><b>${alert.affected.length} plato${alert.affected.length !== 1 ? "s" : ""}</b></div>`;
   screen.querySelectorAll(".affected-card").forEach((node) => node.remove());
   screen.querySelector(".section-title").insertAdjacentHTML("afterend", alert.affected.map((item) => `<article class="affected-card"><h3>${item.dish.name}</h3><p>Antes ${percent(item.before)} · Ahora <b>${percent(item.current)}</b></p><strong>PVP sugerido: ${currency(item.suggested)}</strong></article>`).join(""));
+}
+
+function renderIngredientList() {
+  const screen = document.querySelector("[data-screen='ingredient-list']");
+  if (!screen) return;
+  const list = screen.querySelector(".ing-list");
+  if (!list) return;
+  const alerts = typeof getCostAlerts === "function" ? getCostAlerts() : [];
+  const alertedIds = new Set(alerts.map((a) => a.ingredientId));
+  const sorted = Object.entries(ingredients).sort(([idA], [idB]) => {
+    if (alertedIds.has(idA) && !alertedIds.has(idB)) return -1;
+    if (!alertedIds.has(idA) && alertedIds.has(idB)) return 1;
+    return (ingredients[idA]?.name || "").localeCompare(ingredients[idB]?.name || "");
+  });
+  list.innerHTML = sorted.map(([id, ing]) => {
+    const rise = ing.before > 0 ? (ing.current - ing.before) / ing.before : 0;
+    const isAlert = alertedIds.has(id);
+    const changeBadge = Math.abs(rise) > 0.001 ? `<span class="ing-change ${rise > 0 ? "ing-up" : "ing-down"}">${rise > 0 ? "+" : ""}${Math.round(rise * 100)}%</span>` : "";
+    return `<article class="ing-row${isAlert ? " ing-alert" : ""}" data-go="ingredient-edit" data-ing-id="${id}" role="button" tabindex="0"><div class="ing-info"><h3>${ing.name}</h3><p>${ingDisplayPrice(ing)}</p></div><div class="ing-right">${changeBadge}<span class="ing-arrow">›</span></div></article>`;
+  }).join("");
+}
+
+function renderIngredientEdit() {
+  const screen = document.querySelector("[data-screen='ingredient-edit']");
+  if (!screen) return;
+  const id = typeof selectedIngredientId !== "undefined" ? selectedIngredientId : "";
+  const ing = ingredients[id];
+  if (!ing) return;
+  const displayUnit = ingDisplayUnit(ing);
+  const displayPrice = (ing.unit === "g" || ing.unit === "ml") ? ing.current * 1000 : ing.current;
+  const prevDisplay = (ing.unit === "g" || ing.unit === "ml") ? ing.before * 1000 : ing.before;
+  screen.querySelector(".ing-edit-name").textContent = ing.name;
+  screen.querySelector(".ing-edit-unit").textContent = `Precio por ${displayUnit}`;
+  const input = screen.querySelector(".ing-price-input");
+  if (input) { input.value = displayPrice.toFixed(3).replace(/\.?0+$/, ""); input.step = "0.01"; }
+  const prev = screen.querySelector(".ing-price-prev");
+  if (prev) prev.textContent = `Anterior: ${currency(prevDisplay)} / ${displayUnit}`;
+  const preview = screen.querySelector(".impact-preview");
+  if (!preview) return;
+  const alerts = typeof getCostAlerts === "function" ? getCostAlerts() : [];
+  const myAlert = alerts.find((a) => a.ingredientId === id);
+  preview.innerHTML = myAlert?.affected.length ? `<div class="section-title" style="margin-top:24px">Platos afectados</div>${myAlert.affected.map((item) => `<article class="affected-card"><h3>${item.dish.name}</h3><p>Margen actual: <b>${percent(item.current)}</b></p><strong>PVP sugerido: ${currency(item.suggested)}</strong></article>`).join("")}` : "";
 }
 
 function renderAiPrice() {
