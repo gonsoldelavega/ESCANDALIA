@@ -41,15 +41,14 @@ Codex CTO debe:
 ## Active block
 
 ```yaml
-id: sprint3-10-data-action-contracts
+id: sprint4-escandallos-overview
 status: done
-objective: Anadir contratos data-action de bajo riesgo para acciones core que dependian de texto visible.
+objective: Anadir una vista overview de escandallos visible y vendible para entender coste, PVP, margen y prioridad de revision.
 scope:
   - index.html
-  - script.js
   - product-actions.js
+  - styles.css
   - tests/sprint3-functional-smoke.test.js
-  - SPRINT3_9_ROUTER_LISTENER_AUDIT.md
   - CEO_TASKS.md
 out_of_scope:
   - Supabase/RLS
@@ -60,29 +59,28 @@ out_of_scope:
   - framework
   - Carta QR
   - Stripe
-  - cambios en showScreen
-  - eliminacion de setInterval
-  - eliminacion de stopImmediatePropagation
+  - showScreen salvo minimo imprescindible
+  - setInterval
+  - listeners globales
   - refactor grande del router global
   - calculo suggestedPrice
-  - microcopy visible
+  - funciones core del cost-engine
 tasks:
-  - Anadir data-action a Guardar plato.
-  - Anadir data-action a Revisar manualmente.
-  - Anadir data-action a Guardar cambios.
-  - Actualizar handlers para priorizar data-action y mantener fallback por texto.
+  - Anadir bloque Escandallos dentro del home.
+  - Mostrar platos ordenados por prioridad de revision.
+  - Mostrar coste estimado, PVP, margen y food cost.
+  - Usar badges de margen existentes.
+  - Anadir CTAs seguros a detalle y revisar precio.
   - Ampliar smoke tests.
-  - Actualizar documentacion del estado.
   - Actualizar CEO_TASKS.md.
   - Ejecutar gates.
   - Commit, push y PR.
 checks:
   - node tests/cost-engine.test.js
   - node tests/sprint3-functional-smoke.test.js
-  - node --check script.js
   - node --check product-actions.js
 merge_policy: No hacer merge a main.
-notes: Cambio funcional acotado a contratos data-action con fallback legacy. No cambiar UX ni microcopy.
+notes: Linea tecnica pausada. Prioridad producto visible sin tocar Supabase, SQL, dependencias ni router global.
 ```
 
 ## Backlog
@@ -100,28 +98,25 @@ notes: Cambio funcional acotado a contratos data-action con fallback legacy. No 
 
 ```yaml
 status: done
-branch: codex/sprint3-10-data-action-contracts
+branch: codex/sprint4-escandallos-overview
 commits:
-  - "refactor: add data-action contracts for core buttons"
+  - "feat: add escandallos overview"
 files_modified:
   - CEO_TASKS.md
-  - SPRINT3_9_ROUTER_LISTENER_AUDIT.md
   - index.html
-  - script.js
   - product-actions.js
+  - styles.css
   - tests/sprint3-functional-smoke.test.js
 tests:
   - "node tests/cost-engine.test.js -> 46 passed, 0 failed"
-  - "node tests/sprint3-functional-smoke.test.js -> 14 passed, 0 failed"
-  - "node --check script.js -> passed"
+  - "node tests/sprint3-functional-smoke.test.js -> 16 passed, 0 failed"
   - "node --check product-actions.js -> passed"
-pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/11"
+pr: pending
 risks:
-  - "Fallback por texto se conserva durante la transicion."
-  - "showScreen no se ha tocado."
-  - "setInterval sigue parcheando KPIs/nav en product-actions.js y ops-actions.js."
-  - "listeners capture multiples siguen compitiendo antes del router base."
-next_step: "Validar preview y despues preparar retirada controlada de fallbacks por texto solo cuando el router este consolidado."
+  - "Vista anadida dentro del home para evitar tocar router global."
+  - "CTAs reutilizan data-go existente hacia detalle y precio."
+  - "Validacion visual local por Browser no disponible en esta sesion; queda pendiente revisar preview Vercel en movil."
+next_step: "Abrir PR y validar la preview movil de Vercel antes de merge."
 ```
 
 ## Technical line status
