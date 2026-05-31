@@ -94,6 +94,18 @@ test('manual edit button uses data-action', () => {
   assertIncludes('index', 'data-action="edit-price-manually">Editar manualmente');
 });
 
+test('core product buttons use data-action', () => {
+  assertIncludes('index', 'data-action="save-dish">Guardar plato');
+  assertIncludes('index', 'data-action="review-costs-manually">Revisar manualmente');
+  assertIncludes('index', 'data-action="save-recipe">Guardar cambios');
+});
+
+test('core product handlers prioritize data-action and keep legacy fallback', () => {
+  assertOrdered('script', 'action === "save-dish"', 'button?.textContent.trim() === "Guardar plato"');
+  assertOrdered('productActions', "action === 'review-costs-manually'", "manual?.textContent.trim() === 'Revisar manualmente'");
+  assertOrdered('productActions', "action === 'save-recipe'", "manual?.textContent.trim() === 'Guardar cambios'");
+});
+
 test('apply price handler prioritizes data-action and keeps legacy fallback', () => {
   assertIncludes('applyPrice', 'function applyRecommendedPriceFromCurrentContext()');
   assertOrdered('applyPrice', "button.dataset.action === 'apply-recommended-price'", "label === 'Aplicar nuevo precio'");

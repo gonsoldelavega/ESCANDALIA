@@ -66,6 +66,9 @@
 | --- | --- | --- |
 | `apply-recommended-price` | `index.html`, `apply-price-action.js`, smoke test | Operativo; fallback por texto se conserva. |
 | `edit-price-manually` | `index.html`, `manual-price-action.js`, smoke test | Operativo; fallback por texto se conserva. |
+| `save-dish` | `index.html`, `script.js`, smoke test | Operativo; fallback por texto se conserva. |
+| `review-costs-manually` | `index.html`, `product-actions.js`, smoke test | Operativo; fallback por texto se conserva. |
+| `save-recipe` | `index.html`, `product-actions.js`, smoke test | Operativo; fallback por texto se conserva. |
 | KPIs home | `product-actions.js` asigna `dataset.action` en runtime | Parcial; depende de `setInterval`. |
 
 ## 8. Riesgos por prioridad

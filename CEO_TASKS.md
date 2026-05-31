@@ -41,20 +41,14 @@ Codex CTO debe:
 ## Active block
 
 ```yaml
-id: sprint3-9-router-listener-audit
+id: sprint3-10-data-action-contracts
 status: active
-objective: Auditar router global, listeners, wrappers y parches setInterval antes de tocar comportamiento.
+objective: Anadir contratos data-action de bajo riesgo para acciones core que dependian de texto visible.
 scope:
+  - index.html
   - script.js
   - product-actions.js
-  - ops-actions.js
-  - ops-editable.js
-  - manual-price-action.js
-  - apply-price-action.js
-  - yield-persistence.js
-  - index.html
   - tests/sprint3-functional-smoke.test.js
-  - GLOBAL_OWNERSHIP_AUDIT.md
   - SPRINT3_9_ROUTER_LISTENER_AUDIT.md
   - CEO_TASKS.md
 out_of_scope:
@@ -66,27 +60,29 @@ out_of_scope:
   - framework
   - Carta QR
   - Stripe
-  - comportamiento funcional
-  - cambios en listeners
   - cambios en showScreen
   - eliminacion de setInterval
+  - eliminacion de stopImmediatePropagation
+  - refactor grande del router global
   - calculo suggestedPrice
   - microcopy visible
 tasks:
-  - Mapear listeners click con y sin capture.
-  - Mapear setInterval.
-  - Mapear wrappers showScreen/render.
-  - Mapear stopImmediatePropagation y dependencias por texto visible.
-  - Mapear acciones que ya usan data-action.
-  - Crear SPRINT3_9_ROUTER_LISTENER_AUDIT.md.
+  - Anadir data-action a Guardar plato.
+  - Anadir data-action a Revisar manualmente.
+  - Anadir data-action a Guardar cambios.
+  - Actualizar handlers para priorizar data-action y mantener fallback por texto.
+  - Ampliar smoke tests.
+  - Actualizar documentacion del estado.
   - Actualizar CEO_TASKS.md.
   - Ejecutar gates.
   - Commit, push y PR.
 checks:
   - node tests/cost-engine.test.js
   - node tests/sprint3-functional-smoke.test.js
+  - node --check script.js
+  - node --check product-actions.js
 merge_policy: No hacer merge a main.
-notes: Bloque documental. No modificar comportamiento funcional.
+notes: Cambio funcional acotado a contratos data-action con fallback legacy. No cambiar UX ni microcopy.
 ```
 
 ## Backlog
@@ -101,22 +97,26 @@ notes: Bloque documental. No modificar comportamiento funcional.
 
 ```yaml
 status: done
-branch: codex/sprint3-9-router-listener-audit
+branch: codex/sprint3-10-data-action-contracts
 commits:
-  - "docs: audit global router and listener ownership"
+  - "refactor: add data-action contracts for core buttons"
 files_modified:
   - CEO_TASKS.md
   - SPRINT3_9_ROUTER_LISTENER_AUDIT.md
+  - index.html
+  - script.js
+  - product-actions.js
+  - tests/sprint3-functional-smoke.test.js
 tests:
-  - "main preflight: node tests/cost-engine.test.js -> 46 passed, 0 failed"
-  - "main preflight: node tests/sprint3-functional-smoke.test.js -> 12 passed, 0 failed"
   - "node tests/cost-engine.test.js -> 46 passed, 0 failed"
-  - "node tests/sprint3-functional-smoke.test.js -> 12 passed, 0 failed"
-pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/10"
+  - "node tests/sprint3-functional-smoke.test.js -> 14 passed, 0 failed"
+  - "node --check script.js -> passed"
+  - "node --check product-actions.js -> passed"
+pr: "pending"
 risks:
-  - "showScreen tiene wrappers encadenados en product-actions.js y ops-actions.js."
+  - "Fallback por texto se conserva durante la transicion."
+  - "showScreen no se ha tocado."
   - "setInterval sigue parcheando KPIs/nav en product-actions.js y ops-actions.js."
   - "listeners capture multiples siguen compitiendo antes del router base."
-  - "varias acciones siguen dependiendo de texto visible."
-next_step: "Implementar un bloque pequeno de data-action para Guardar plato, Revisar manualmente y Guardar cambios, con fallback y smoke tests."
+next_step: "Validar preview y despues preparar retirada controlada de fallbacks por texto solo cuando el router este consolidado."
 ```

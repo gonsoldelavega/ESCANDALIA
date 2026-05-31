@@ -214,7 +214,8 @@ document.addEventListener("click", async (event) => {
     return;
   }
   const button = event.target.closest("button");
-  if (button?.textContent.trim() === "Guardar plato") await createDishFromForm();
+  const action = button?.dataset.action;
+  if (action === "save-dish" || button?.textContent.trim() === "Guardar plato") await createDishFromForm();
   if (button?.textContent.trim() === "Aplicar nuevo precio" || button?.textContent.trim() === "Aplicar precios sugeridos") await applyRecommendedPrice();
   const trigger = event.target.closest("[data-go]");
   if (!trigger) return;
