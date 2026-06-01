@@ -1,0 +1,307 @@
+/* ═══════════════════════════════════════════════════════════════
+   Escandalia — Premium Visual Layer
+   Solo CSS/UI. No toca lógica ni estructura de componentes.
+   Para revertir: quitar el <link> en index.html.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Tokens adicionales ─────────────────────────────────────── */
+:root {
+  --t: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast: 0.1s ease;
+  --shadow-card: 0 1px 3px rgba(60,38,24,.06), 0 4px 12px rgba(60,38,24,.07);
+  --shadow-card-hover: 0 4px 14px rgba(60,38,24,.09), 0 14px 30px rgba(60,38,24,.13);
+  --shadow-sm: 0 2px 8px rgba(60,38,24,.07);
+  --shadow-btn-hover: 0 20px 36px rgba(193,96,58,.32);
+}
+
+/* ── 2. Render quality ─────────────────────────────────────────── */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* ── 3. Scrollbar delgada ──────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── 4. Tipografía — ajustes de ritmo ──────────────────────────── */
+.hero h1 { letter-spacing: -0.02em; line-height: 1.0; }
+.brand { letter-spacing: -0.015em; }
+.hero p, .muted-on-dark { line-height: 1.52; }
+.dish-info h3 { letter-spacing: -0.01em; }
+.escandallo-main h3 { letter-spacing: -0.01em; }
+
+/* ── 5. Botón primario — hover / active ────────────────────────── */
+.primary-button {
+  transition: transform var(--t), box-shadow var(--t), background var(--t);
+  letter-spacing: 0.01em;
+}
+.primary-button:hover {
+  background: #c96840;
+  box-shadow: var(--shadow-btn-hover);
+  transform: translateY(-1px);
+}
+.primary-button:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(193,96,58,.18);
+}
+
+/* ── 6. Botón secundario ───────────────────────────────────────── */
+.secondary-button {
+  transition: border-color var(--t), background var(--t), color var(--t);
+}
+.secondary-button:hover {
+  border-color: var(--terracotta);
+  color: var(--terracotta);
+  background: rgba(193,96,58,.04);
+}
+.secondary-button.ai:hover {
+  border-color: var(--olive);
+  color: var(--olive-dark);
+  background: rgba(102,118,56,.05);
+}
+
+/* ── 7. Botón de texto ─────────────────────────────────────────── */
+.text-action {
+  transition: opacity var(--t);
+  letter-spacing: 0.01em;
+}
+.text-action:hover { opacity: 0.7; }
+
+/* ── 8. FAB ────────────────────────────────────────────────────── */
+.fab {
+  transition: transform var(--t), box-shadow var(--t);
+}
+.fab:hover {
+  transform: scale(1.09) translateY(-2px);
+  box-shadow: 0 22px 42px rgba(193,96,58,.45);
+}
+.fab:active {
+  transform: scale(0.95);
+  box-shadow: 0 8px 18px rgba(193,96,58,.28);
+}
+
+/* ── 9. Botón Escanear factura ─────────────────────────────────── */
+.scan-invoice-btn {
+  transition: transform var(--t), box-shadow var(--t);
+}
+.scan-invoice-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 38px rgba(193,96,58,.34);
+}
+.scan-invoice-btn:active { transform: translateY(0); }
+
+/* ── 10. Botón de peligro ──────────────────────────────────────── */
+.danger-button {
+  transition: background var(--t), border-color var(--t), transform var(--t-fast);
+}
+.danger-button:hover {
+  background: #fde7de;
+  border-color: #e8a9a0;
+  transform: translateY(-1px);
+}
+.danger-button:active { transform: translateY(0); }
+
+/* ── 11. Botón volver ──────────────────────────────────────────── */
+.back { transition: opacity var(--t); }
+.back:hover { opacity: 0.72; }
+
+/* ── 12. Avatar ────────────────────────────────────────────────── */
+.avatar {
+  transition: transform var(--t), box-shadow var(--t);
+  box-shadow: 0 2px 10px rgba(193,96,58,.28);
+}
+.avatar:hover {
+  transform: scale(1.07);
+  box-shadow: 0 4px 18px rgba(193,96,58,.42);
+}
+
+/* ── 13. Cards de platos — hover lift ──────────────────────────── */
+.dish-card {
+  box-shadow: var(--shadow-card);
+  transition: transform var(--t), box-shadow var(--t), border-color var(--t);
+  cursor: pointer;
+}
+.dish-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: rgba(193,96,58,.18);
+}
+.dish-card:active { transform: translateY(0); }
+
+/* ── 14. Cards de escandallos ──────────────────────────────────── */
+.escandallo-card {
+  box-shadow: var(--shadow-card);
+  transition: transform var(--t), box-shadow var(--t);
+  cursor: pointer;
+}
+.escandallo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+.escandallo-card:active { transform: translateY(0); }
+
+/* ── 15. Filas de ingredientes ─────────────────────────────────── */
+.ing-row {
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
+}
+.ing-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(60,38,24,.1);
+  border-color: rgba(193,96,58,.2);
+}
+.ing-row:active { transform: translateY(0); }
+
+/* ── 16. Filas de ops / estado ─────────────────────────────────── */
+.ops-row {
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t), box-shadow var(--t);
+}
+.ops-row:hover {
+  border-color: rgba(60,38,24,.18);
+  box-shadow: 0 4px 16px rgba(60,38,24,.1);
+}
+
+/* ── 17. State-list articles ───────────────────────────────────── */
+.state-list article {
+  transition: border-color var(--t), box-shadow var(--t);
+}
+.state-list article:hover {
+  border-color: var(--olive-soft);
+  box-shadow: 0 4px 12px rgba(102,118,56,.1);
+}
+
+/* ── 18. Settings cards ────────────────────────────────────────── */
+.settings-card {
+  transition: box-shadow var(--t);
+}
+.settings-card:hover {
+  box-shadow: 0 8px 26px rgba(60,38,24,.11);
+}
+
+/* ── 19. Format summary articles ───────────────────────────────── */
+.format-summary article {
+  transition: border-color var(--t), box-shadow var(--t);
+}
+.format-summary article:hover {
+  border-color: rgba(102,118,56,.3);
+  box-shadow: 0 4px 12px rgba(102,118,56,.08);
+}
+
+/* ── 20. KPI cards ─────────────────────────────────────────────── */
+.kpi {
+  transition: background var(--t), transform var(--t-fast);
+}
+.kpi:hover {
+  background: rgba(255,255,255,.14);
+  transform: translateY(-1px);
+}
+.kpi:active { transform: translateY(0); }
+
+/* ── 21. Foco en inputs y selects ──────────────────────────────── */
+input:focus,
+select:focus,
+.invoice-match-select:focus {
+  outline: none;
+  border-color: var(--terracotta) !important;
+  box-shadow: 0 0 0 3px rgba(193,96,58,.13);
+  transition: border-color var(--t), box-shadow var(--t);
+}
+
+/* ── 22. Yield / unit rows ─────────────────────────────────────── */
+.yield-row,
+.yield-unit-row {
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t), box-shadow var(--t);
+}
+.yield-row:hover,
+.yield-unit-row:hover {
+  border-color: rgba(193,96,58,.2);
+  box-shadow: 0 4px 14px rgba(60,38,24,.09);
+}
+
+/* ── 23. Price edit card — foco activo ─────────────────────────── */
+.price-edit-card {
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t), border-color var(--t);
+}
+.price-edit-card:focus-within {
+  border-color: rgba(193,96,58,.3);
+  box-shadow: 0 4px 18px rgba(193,96,58,.1);
+}
+
+/* ── 24. Invoice lines ─────────────────────────────────────────── */
+.invoice-line {
+  transition: border-color var(--t), box-shadow var(--t);
+}
+.invoice-line:hover {
+  border-color: rgba(60,38,24,.2);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── 25. Alt price chips ───────────────────────────────────────── */
+.alt-price-chip {
+  transition: border-color var(--t), color var(--t), background var(--t);
+}
+
+/* ── 26. Botones de idioma y categoría ─────────────────────────── */
+.language-row button,
+.category-tabs button {
+  transition: background var(--t), color var(--t), border-color var(--t);
+}
+.language-row button:hover:not(.is-selected),
+.category-tabs button:hover:not(.is-selected) {
+  border-color: var(--olive);
+  color: var(--olive-dark);
+}
+
+/* ── 27. Icon buttons ──────────────────────────────────────────── */
+.icon-button {
+  transition: background var(--t), color var(--t), transform var(--t-fast);
+}
+.icon-button:hover {
+  background: var(--terracotta-soft);
+  color: var(--terracotta);
+  transform: scale(1.1);
+}
+.icon-button:active { transform: scale(0.95); }
+
+/* ── 28. Bottom nav — active tint ──────────────────────────────── */
+.bottom-nav button {
+  transition: color var(--t), background var(--t);
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+.bottom-nav button.is-active {
+  background: rgba(193,96,58,.08);
+}
+
+/* ── 29. Elementos de profundidad ──────────────────────────────── */
+.total-card { box-shadow: 0 8px 26px rgba(25,25,22,.22); }
+.recommendation { box-shadow: 0 8px 26px rgba(25,25,22,.2); }
+.alert-card { box-shadow: 0 2px 14px rgba(193,96,58,.1); }
+.summary-panel, .impact-grid { box-shadow: var(--shadow-sm); }
+.no-alerts { box-shadow: var(--shadow-sm); }
+.qr-card { box-shadow: 0 18px 48px rgba(60,38,24,.13); }
+
+/* ── 30. Manual product / ops form cards ───────────────────────── */
+.manual-product-card,
+.ops-form,
+.ops-edit-card {
+  transition: box-shadow var(--t);
+}
+.manual-product-card:focus-within,
+.ops-form:focus-within,
+.ops-edit-card:focus-within {
+  box-shadow: 0 8px 28px rgba(60,38,24,.1);
+}
+
+/* ── 31. Compact action buttons ────────────────────────────────── */
+.compact-action {
+  transition: transform var(--t-fast), box-shadow var(--t-fast);
+}
+.compact-action:hover { transform: translateY(-1px); }
+.compact-action:active { transform: translateY(0); }
