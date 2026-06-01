@@ -46,11 +46,11 @@ async function handleInvoiceFile(file) {
   if (!file) return;
   showInvoiceStatus("Leyendo la factura…", true);
   try {
-    const { dataUrl, mediaType } = await resizeImageToBase64(file);
+    const { dataUrl } = await resizeImageToBase64(file);
     const res = await fetch("/api/scan-invoice", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ image: dataUrl, mediaType, ingredients: ingredientCatalogForScan() }),
+      body: JSON.stringify({ image: dataUrl, ingredients: ingredientCatalogForScan() }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "No se pudo leer la factura.");
@@ -69,6 +69,22 @@ async function handleInvoiceFile(file) {
     console.error(error);
     showInvoiceStatus(error.message || "Error al leer la factura.", false);
   }
+}
+
+/** Opciones <option> de ingredientes ordenadas por nombre. */
+function ingredientSelectOptions(selectedId) {
+  return Object.entries(ingredients)
+    .sort(([, a], [, b]) => a.name.localeCompare(b.name))
+    .map(([id, ing]) => `<option value="${id}" ${id === selectedId ? "selected" : ""}>${ing.name}</option>`)
+    .join("");
+}
+
+/** Chips para elegir otro número detectado en la línea, si el heurístico falló. */
+function alternatePriceChips(line, current) {
+  const others = (line.allPrices || []).filter((p) => Math.abs(p - current) > 0.001);
+  if (others.length < 1) return "";
+  const unique = [...new Set(others)].slice(0, 4);
+  return `<div class="invoice-alt-prices">¿Otro precio? ${unique.map((p) => `<button type="button" class="alt-price-chip" data-alt-price="${line.key}" data-alt-value="${p}">${currency(p)}</button>`).join("")}</div>`;
 }
 
 function showInvoiceStatus(message, busy) {
@@ -94,18 +110,17 @@ function renderInvoiceReview() {
     const unit = ing ? ingDisplayUnit(ing) : line.unit || "";
     const rise = oldPrice && oldPrice > 0 ? (newPrice - oldPrice) / oldPrice : 0;
     const riseBadge = oldPrice ? `<span class="ing-change ${rise > 0 ? "ing-up" : rise < 0 ? "ing-down" : ""}">${rise > 0 ? "+" : ""}${Math.round(rise * 100)}%</span>` : '<span class="ing-change">nuevo</span>';
-    const matchInfo = ing
-      ? `<strong>${ing.name}</strong>`
-      : `<strong class="unmatched">Sin coincidencia</strong>`;
+    const options = `<option value="">— Sin asignar —</option>${ingredientSelectOptions(line.matchedId)}`;
     return `<article class="invoice-line ${line.include ? "" : "is-excluded"}" data-line="${line.key}">
       <label class="invoice-check"><input type="checkbox" data-invoice-include="${line.key}" ${line.include ? "checked" : ""} ${ing ? "" : "disabled"} /></label>
       <div class="invoice-line-body">
-        <div class="invoice-line-top">${matchInfo}${riseBadge}</div>
+        <div class="invoice-line-top"><select class="invoice-match-select" data-invoice-match="${line.key}">${options}</select>${riseBadge}</div>
         <p class="invoice-line-sub">Factura: ${line.invoiceName || "—"}</p>
         <div class="invoice-line-prices">
           ${oldPrice != null ? `<span>${currency(oldPrice)}/${unit}</span><span class="invoice-arrow">→</span>` : ""}
           <input class="invoice-price-input" type="number" inputmode="decimal" step="0.01" value="${newPrice.toFixed(2)}" data-invoice-price="${line.key}" /><span class="invoice-unit">€/${unit}</span>
         </div>
+        ${alternatePriceChips(line, newPrice)}
       </div>
     </article>`;
   }).join("");
@@ -135,6 +150,16 @@ document.addEventListener("change", (event) => {
     renderInvoiceReview();
     return;
   }
+  const matchSelect = event.target.closest("[data-invoice-match]");
+  if (matchSelect) {
+    const line = invoiceLines.find((l) => l.key === Number(matchSelect.dataset.invoiceMatch));
+    if (line) {
+      line.matchedId = matchSelect.value || null;
+      line.include = Boolean(line.matchedId) && Number(line.pricePerUnit) > 0;
+    }
+    renderInvoiceReview();
+    return;
+  }
   const price = event.target.closest("[data-invoice-price]");
   if (price) {
     const line = invoiceLines.find((l) => l.key === Number(price.dataset.invoicePrice));
@@ -146,6 +171,14 @@ document.addEventListener("click", (event) => {
   if (event.target.closest(".invoice-scan-trigger")) {
     event.preventDefault();
     document.querySelector("#invoice-file")?.click();
+    return;
+  }
+  const altChip = event.target.closest("[data-alt-price]");
+  if (altChip) {
+    event.preventDefault();
+    const line = invoiceLines.find((l) => l.key === Number(altChip.dataset.altPrice));
+    if (line) line.pricePerUnit = parseFloat(altChip.dataset.altValue);
+    renderInvoiceReview();
     return;
   }
   if (event.target.closest(".invoice-apply")) {
