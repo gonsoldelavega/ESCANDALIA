@@ -15,13 +15,24 @@ function renderHome() {
   const margins = dishes.map((dish) => dishMargin(dish));
   const averageMargin = margins.length ? margins.reduce((sum, item) => sum + item, 0) / margins.length : 0;
   const alert = oilAlert();
-  document.querySelector(".avatar").textContent = business.ownerInitials;
-  document.querySelector("[data-screen='home'] .hero h1").textContent = business.name;
+  // Nota: esta es la renderHome base. product-actions.js la sustituye por la
+  // versión definitiva (alertas dinámicas). Los selectores que el rediseño
+  // eliminó (.alert-card) se guardan con ?. para evitar el crash en el primer
+  // render síncrono, antes de que se cargue el parche.
+  const avatar = document.querySelector(".avatar");
+  if (avatar) avatar.textContent = business.ownerInitials;
+  const homeTitle = document.querySelector("[data-screen='home'] .hero h1");
+  if (homeTitle) homeTitle.textContent = business.name;
   const kpis = document.querySelectorAll("[data-screen='home'] .kpi strong");
-  kpis[0].textContent = percent(averageMargin); kpis[1].textContent = dishes.length; kpis[2].textContent = alert.affected.length;
-  document.querySelector(".alert-card h2").textContent = `Aceite de oliva +${Math.round(alert.rise * 100)}%`;
-  document.querySelector(".alert-card p").textContent = `${alert.affected.length} platos han bajado su margen por debajo del 65%`;
-  document.querySelector(".dish-list").innerHTML = dishes.map((dish) => `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>Coste: <b>${currency(dishCost(dish))}</b> · PVP: ${currency(dish.pvp)}</p></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`).join("");
+  if (kpis[0]) kpis[0].textContent = percent(averageMargin);
+  if (kpis[1]) kpis[1].textContent = dishes.length;
+  if (kpis[2]) kpis[2].textContent = alert.affected.length;
+  const alertHeading = document.querySelector(".alert-card h2");
+  if (alertHeading) alertHeading.textContent = `Aceite de oliva +${Math.round(alert.rise * 100)}%`;
+  const alertBody = document.querySelector(".alert-card p");
+  if (alertBody) alertBody.textContent = `${alert.affected.length} platos han bajado su margen por debajo del 65%`;
+  const dishList = document.querySelector(".dish-list");
+  if (dishList) dishList.innerHTML = dishes.map((dish) => `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>Coste: <b>${currency(dishCost(dish))}</b> · PVP: ${currency(dish.pvp)}</p></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`).join("");
 }
 
 function renderDetail() {
