@@ -41,11 +41,10 @@ Codex CTO debe:
 ## Active block
 
 ```yaml
-id: sprint4-escandallos-overview
+id: sprint4-1-actionable-escandallos
 status: done
-objective: Anadir una vista overview de escandallos visible y vendible para entender coste, PVP, margen y prioridad de revision.
+objective: Convertir Escandallos en un bloque accionable con resumen, filtros de margen y prioridad de revision.
 scope:
-  - index.html
   - product-actions.js
   - styles.css
   - tests/sprint3-functional-smoke.test.js
@@ -66,11 +65,11 @@ out_of_scope:
   - calculo suggestedPrice
   - funciones core del cost-engine
 tasks:
-  - Anadir bloque Escandallos dentro del home.
-  - Mostrar platos ordenados por prioridad de revision.
-  - Mostrar coste estimado, PVP, margen y food cost.
-  - Usar badges de margen existentes.
-  - Anadir CTAs seguros a detalle y revisar precio.
+  - Anadir resumen superior de platos a revisar, margen saludable y margen medio estimado.
+  - Anadir filtros Todos, Margen bajo, Margen medio y Margen bueno.
+  - Mantener orden por prioridad de revision.
+  - Mantener CTAs seguros a detalle y revisar precio.
+  - Validar visualmente en 430px y 375px si es posible.
   - Ampliar smoke tests.
   - Actualizar CEO_TASKS.md.
   - Ejecutar gates.
@@ -98,25 +97,24 @@ notes: Linea tecnica pausada. Prioridad producto visible sin tocar Supabase, SQL
 
 ```yaml
 status: done
-branch: codex/sprint4-escandallos-overview
+branch: codex/sprint4-1-actionable-escandallos
 commits:
-  - "feat: add escandallos overview"
+  - "feat: make escandallos overview actionable"
 files_modified:
   - CEO_TASKS.md
-  - index.html
   - product-actions.js
   - styles.css
   - tests/sprint3-functional-smoke.test.js
 tests:
   - "node tests/cost-engine.test.js -> 46 passed, 0 failed"
-  - "node tests/sprint3-functional-smoke.test.js -> 16 passed, 0 failed"
+  - "node tests/sprint3-functional-smoke.test.js -> 17 passed, 0 failed"
   - "node --check product-actions.js -> passed"
-pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/12"
+pr: "https://github.com/gonsoldelavega/ESCANDALIA/pull/13"
 risks:
-  - "Vista anadida dentro del home para evitar tocar router global."
-  - "CTAs reutilizan data-go existente hacia detalle y precio."
-  - "Validacion visual local por Browser no disponible en esta sesion; queda pendiente revisar preview Vercel en movil."
-next_step: "Abrir PR y validar la preview movil de Vercel antes de merge."
+  - "No se toca router global ni navegacion inferior."
+  - "Filtro implementado en el listener existente de product-actions.js."
+  - "Validacion visual 430px correcta; captura 375px con Edge headless recorta por ancho minimo del motor y debe revisarse tambien en preview movil real."
+next_step: "Abrir PR y validar la preview de Vercel en movil real antes de merge."
 ```
 
 ## Technical line status

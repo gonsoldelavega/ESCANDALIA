@@ -90,6 +90,14 @@ function prepareEmptyDishForm() {
   if (summary) summary.innerHTML = `<span>Coste receta</span><strong>0,00€</strong><span>Coste por tapa</span><strong class="good-text">--</strong>`;
 }
 
+let escandallosFilter = 'all';
+
+function escandalloState(margin) {
+  if (margin >= 0.7) return 'good';
+  if (margin >= 0.62) return 'mid';
+  return 'low';
+}
+
 function escandalloBadgeLabel(margin) {
   if (margin >= 0.7) return 'Margen bueno';
   if (margin >= 0.62) return 'Margen medio';
@@ -99,21 +107,33 @@ function escandalloBadgeLabel(margin) {
 function renderEscandallosOverview() {
   const list = document.querySelector('.escandallos-list');
   if (!list) return;
-  const rows = [...dishes].sort((a, b) => dishMargin(a) - dishMargin(b));
+  const rows = [...dishes].map((dish) => {
+    const format = primaryFormat(dish);
+    const margin = formatMargin(dish, format);
+    const hasRecipe = Boolean(dish.recipe?.length);
+    return { dish, format, margin, hasRecipe, state: hasRecipe ? escandalloState(margin) : 'low' };
+  }).sort((a, b) => a.margin - b.margin);
   if (!rows.length) {
     list.innerHTML = '<div class="empty-note">Sin datos. Añade platos para ver escandallos.</div>';
     return;
   }
-  list.innerHTML = rows.map((dish) => {
-    const format = primaryFormat(dish);
+  const visibleRows = escandallosFilter === 'all' ? rows : rows.filter((item) => item.state === escandallosFilter);
+  const reviewCount = rows.filter((item) => item.state === 'low').length;
+  const goodCount = rows.filter((item) => item.state === 'good').length;
+  const averageMargin = rows.length ? rows.reduce((sum, item) => sum + item.margin, 0) / rows.length : 0;
+  const filters = [
+    ['all', 'Todos'],
+    ['low', 'Margen bajo'],
+    ['mid', 'Margen medio'],
+    ['good', 'Margen bueno']
+  ];
+  list.innerHTML = `<div class="escandallos-summary"><article><strong>${reviewCount}</strong><span>platos a revisar</span></article><article><strong>${goodCount}</strong><span>margen saludable</span></article><article><strong>${percent(averageMargin)}</strong><span>margen medio estimado</span></article></div><div class="escandallos-priority">Revisar estos platos primero</div><div class="escandallos-filters" aria-label="Filtros de margen">${filters.map(([value, label]) => `<button class="${escandallosFilter === value ? 'is-active' : ''}" type="button" data-escandallo-filter="${value}">${label}</button>`).join('')}</div>${visibleRows.length ? visibleRows.map(({ dish, format, margin, hasRecipe }) => {
     const cost = formatCost(dish, format);
     const pvp = Number(format.pvp) || 0;
-    const margin = formatMargin(dish, format);
     const foodCost = pvp > 0 ? cost / pvp : 0;
-    const hasRecipe = Boolean(dish.recipe?.length);
     const badgeClass = marginClass(margin);
     return `<article class="escandallo-card ${badgeClass}" data-dish-id="${dish.id}"><div class="escandallo-main"><span class="escandallo-kicker">${hasRecipe ? escandalloBadgeLabel(margin) : 'Pendiente de receta'}</span><h3>${dish.name}</h3><p>Coste del plato <b>${hasRecipe ? currency(cost) : 'Sin datos'}</b> · PVP actual <b>${currency(pvp)}</b></p></div><div class="escandallo-metrics"><div><span>Margen estimado</span><strong>${hasRecipe ? percent(margin) : '--'}</strong></div><div><span>Food cost</span><strong>${hasRecipe && pvp > 0 ? percent(foodCost) : '--'}</strong></div></div><div class="escandallo-actions"><button class="secondary-button compact-action" type="button" data-go="dish-detail" data-dish-id="${dish.id}">Ver detalle</button><button class="primary-button compact-action" type="button" data-go="ai-price" data-dish-id="${dish.id}">Revisar precio</button></div></article>`;
-  }).join('');
+  }).join('') : '<div class="empty-note">No hay platos en este filtro.</div>'}`;
 }
 
 renderHome = function patchedRenderHome() {
@@ -295,6 +315,13 @@ setInterval(() => {
 }, 500);
 
 document.addEventListener('click', async (event) => {
+  const escandalloFilter = event.target.closest('[data-escandallo-filter]');
+  if (escandalloFilter) {
+    event.preventDefault();
+    escandallosFilter = escandalloFilter.dataset.escandalloFilter || 'all';
+    renderEscandallosOverview();
+    return;
+  }
   const kpi = event.target.closest('.kpi');
   if (kpi?.dataset.action === 'alerts') { event.preventDefault(); showScreen('ingredient-alert'); return; }
   if (kpi?.dataset.action === 'active-dishes') { event.preventDefault(); showScreen('home'); setTimeout(() => document.querySelector('.dish-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); return; }
