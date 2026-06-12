@@ -191,6 +191,18 @@ test('escandallos overview uses existing cost helpers and margin badges', () => 
   assertIncludes('styles', '.escandallo-actions{display:grid;grid-template-columns:1fr');
 });
 
+test('bottom nav stays reachable on every screen except the public menu', () => {
+  // Regression guard: switching tabs must never require the back button. The
+  // nav is hidden only on the public customer menu. Both the base showScreen
+  // and the product-actions overlay must agree on this.
+  assertIncludes('script', 'nav.style.display = publicView ? "none" : "grid"');
+  assertIncludes('productActions', "bottomNav.style.display = isPublic ? 'none' : 'grid'");
+  assert(
+    !includes('productActions', "['home', 'qr', 'settings'].includes(name)"),
+    'product-actions.js still restricts the bottom nav to primary screens',
+  );
+});
+
 console.log('--------------------------------------------------');
 console.log(`${passed} passed, ${failed} failed`);
 
