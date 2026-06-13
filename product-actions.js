@@ -26,15 +26,18 @@ function activateDynamicScreen(name) {
   const screen = document.querySelector(`[data-screen="${name}"]`);
   if (!screen) return;
   document.querySelectorAll('.app-screen').forEach((item) => item.classList.toggle('is-active', item === screen));
-  document.querySelectorAll('.bottom-nav button').forEach((button) => button.classList.toggle('is-active', button.dataset.go === name));
-  const isPrimary = ['home', 'qr', 'settings'].includes(name);
+  // The bottom nav must stay reachable from every screen so switching tabs is
+  // always one tap away. Only the public customer menu hides it. The active-tab
+  // highlight is set by the base showScreen (which maps sub-screens like
+  // edit-recipe / ingredient-costs to their parent tab), so we don't override
+  // it here.
   const isPublic = name === 'public-menu';
   const bottomNav = document.querySelector('.bottom-nav');
   const quickAdd = document.querySelector('.fab');
   const phoneShell = document.querySelector('.phone-shell');
-  if (bottomNav) bottomNav.style.display = isPrimary && !isPublic ? 'grid' : 'none';
-  if (quickAdd) quickAdd.style.display = isPrimary && !isPublic ? 'block' : 'none';
-  phoneShell?.classList.toggle('nav-hidden', !isPrimary || isPublic);
+  if (bottomNav) bottomNav.style.display = isPublic ? 'none' : 'grid';
+  if (quickAdd) quickAdd.style.display = name === 'home' ? 'block' : 'none';
+  phoneShell?.classList.toggle('nav-hidden', isPublic);
 }
 
 function renderCostEditor() {
