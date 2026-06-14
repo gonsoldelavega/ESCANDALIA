@@ -26,6 +26,8 @@ const files = {
   productActions: read('product-actions.js'),
   yieldPersistence: read('yield-persistence.js'),
   opsActions: read('ops-actions.js'),
+  menuI18n: read('public-menu-i18n.js'),
+  renderEngine: read('render-engine.js'),
 };
 
 let passed = 0;
@@ -201,6 +203,25 @@ test('bottom nav stays reachable on every screen except the public menu', () => 
     !includes('productActions', "['home', 'qr', 'settings'].includes(name)"),
     'product-actions.js still restricts the bottom nav to primary screens',
   );
+});
+
+test('public QR menu supports ES/EN/FR/DE switching', () => {
+  // The i18n layer must load before script.js so its globals exist on first render.
+  assertOrdered('index', 'public-menu-i18n.js', 'script.js');
+  assertIncludes('menuI18n', "MENU_LANGS = ['es', 'en', 'fr', 'de']");
+  assertIncludes('menuI18n', 'function translateDish');
+  assertIncludes('menuI18n', 'function setMenuLanguage');
+  // Language switch is wired to the public menu flag buttons.
+  assertIncludes('menuI18n', ".closest('.language-row button')");
+  // renderPublicMenu actually consumes the translation layer instead of raw Spanish.
+  assertIncludes('renderEngine', 'translate(dish)');
+  assertIncludes('renderEngine', 'ui.subtitle');
+  assertIncludes('index', '>DE</button>');
+});
+
+test('public menu renderer falls back gracefully when translations are missing', () => {
+  assertIncludes('menuI18n', 'if (lang === \'es\') return base');
+  assertIncludes('menuI18n', 'name: source.name || base.name');
 });
 
 console.log('--------------------------------------------------');

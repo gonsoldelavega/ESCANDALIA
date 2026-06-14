@@ -136,6 +136,16 @@ function renderAiPrice() {
 }
 
 function renderPublicMenu() {
-  document.querySelector(".public-header h1").textContent = business.name;
-  document.querySelector("[data-screen='public-menu'] .content").innerHTML = `<div class="category-tabs"><button class="is-selected">Tapas</button><button>Bocadillos</button><button>Bebidas</button></div>${dishes.filter((dish) => dish.published).map((dish) => `<article class="menu-item"><div><h3>${dish.name}</h3><p>${dish.description || "Descripción pendiente."}</p><span>${dish.allergens}</span></div><strong>${currency(dish.pvp)}</strong></article>`).join("")}`;
+  const ui = (typeof menuUi === "function") ? menuUi() : { subtitle: "Carta", descPending: "Descripción pendiente.", categories: {} };
+  const translate = (typeof translateDish === "function") ? translateDish : (dish) => dish;
+  const header = document.querySelector(".public-header h1");
+  if (header) header.textContent = business.name;
+  const subtitle = document.querySelector(".public-header p");
+  if (subtitle) subtitle.textContent = ui.subtitle;
+  const categoryTabs = ["Tapas", "Bocadillos", "Bebidas"].map((cat, index) => `<button class="${index === 0 ? "is-selected" : ""}" type="button">${ui.categories[cat] || cat}</button>`).join("");
+  const items = dishes.filter((dish) => dish.published).map((dish) => {
+    const t = translate(dish);
+    return `<article class="menu-item"><div><h3>${t.name}</h3><p>${t.description || ui.descPending}</p><span>${t.allergens || ""}</span></div><strong>${currency(dish.pvp)}</strong></article>`;
+  }).join("");
+  document.querySelector("[data-screen='public-menu'] .content").innerHTML = `<div class="category-tabs">${categoryTabs}</div>${items}`;
 }
