@@ -28,6 +28,8 @@ const files = {
   opsActions: read('ops-actions.js'),
   menuI18n: read('public-menu-i18n.js'),
   renderEngine: read('render-engine.js'),
+  menuTranslate: read('menu-translate.js'),
+  translateApi: read('api/translate-menu.js'),
 };
 
 let passed = 0;
@@ -222,6 +224,25 @@ test('public QR menu supports ES/EN/FR/DE switching', () => {
 test('public menu renderer falls back gracefully when translations are missing', () => {
   assertIncludes('menuI18n', 'if (lang === \'es\') return base');
   assertIncludes('menuI18n', 'name: source.name || base.name');
+});
+
+test('AI menu translation endpoint is wired and guarded', () => {
+  // Backend: batches all text fields into one Google Translate call per language.
+  assertIncludes('translateApi', 'translation.googleapis.com/language/translate/v2');
+  assertIncludes('translateApi', 'GOOGLE_TRANSLATE_API_KEY');
+  assertIncludes('translateApi', 'ALLOWED_TARGETS = { en: true, fr: true, de: true }');
+  assertIncludes('translateApi', "FIELDS = [\"name\", \"description\", \"allergens\"]");
+});
+
+test('AI menu translation client fills dish.translations and caches it', () => {
+  assertIncludes('index', 'menu-translate.js');
+  assertIncludes('index', 'translate-menu-trigger');
+  assertIncludes('menuTranslate', "TRANSLATE_TARGETS = [\"en\", \"fr\", \"de\"]");
+  assertIncludes('menuTranslate', "fetch(\"/api/translate-menu\"");
+  assertIncludes('menuTranslate', 'dish.translations[target] = translated');
+  assertIncludes('menuTranslate', 'saveCachedTranslations(cache)');
+  // The i18n layer must prefer those stored translations over the demo ones.
+  assertOrdered('menuI18n', 'dish.translations && dish.translations[lang]', 'DISH_TRANSLATIONS[dish.name]');
 });
 
 console.log('--------------------------------------------------');
