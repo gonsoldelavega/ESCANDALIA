@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\":\"⏳ RECORDATORIO PENDIENTE (ESCANDALIA): Falta activar la traducción de la carta con IA en producción → 1) Activar «Cloud Translation API» en Google Cloud, 2) Añadir la variable GOOGLE_TRANSLATE_API_KEY en Vercel, 3) (después) persistir dish.translations en Supabase. Quita este recordatorio cuando esté hecho.\"}'"
+          }
+        ]
+      }
+    ]
+  }
+}
