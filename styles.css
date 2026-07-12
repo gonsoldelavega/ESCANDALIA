@@ -396,6 +396,29 @@ button{ cursor:pointer }
 .allergen-chip{ padding:3px 9px; border-radius:999px; background:rgba(181,83,42,.1); color:#8a3d1c; font-size:11px; font-weight:600 }
 .qr-box canvas{ display:block; border-radius:8px }
 
+/* ── LOCALES Y ROLES ─────────────────────────────────────────────── */
+.role-options{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap }
+.role-chip{ flex:1; min-width:88px; padding:10px 8px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.14)); background:#fff; font-size:13px; font-weight:600; cursor:pointer }
+.role-chip.is-active{ background:#2b2a27; color:#fff; border-color:transparent }
+.locales-list{ margin-top:10px; display:flex; flex-direction:column; gap:8px }
+.locale-row{ display:flex; align-items:center; gap:8px }
+.locale-switch{ flex:1; text-align:left; padding:12px 14px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); background:#fff; font-size:15px; font-weight:600; cursor:pointer }
+.locale-row.is-active .locale-switch{ border-color:var(--rust,#b5532a); color:var(--rust,#b5532a) }
+.locale-delete{ padding:8px 12px; font-size:16px; line-height:1; border-radius:12px }
+.locale-new{ display:flex; gap:8px; margin-top:10px }
+.locale-new input{ flex:1; padding:12px 14px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); font-size:15px; background:#fff }
+.locale-new .create-locale{ white-space:nowrap }
+
+/* Ocultación de acciones según rol */
+body.role-manager .save-settings{ display:none }
+body.role-kitchen .save-settings,
+body.role-kitchen .publish-toggle,
+body.role-kitchen [data-action="apply-recommended-price"],
+body.role-kitchen [data-action="edit-price-manually"],
+body.role-kitchen .delete-purchase,
+body.role-kitchen .delete-sale,
+body.role-kitchen .save-sale{ display:none }
+
 /* ── ESCANDALLOS ─────────────────────────────────────────────────── */
 .escandallos-panel{ margin-top:28px }
 .overview-copy{ margin:-8px 0 14px; color:var(--text-3); font-size:13px; line-height:1.4 }
