@@ -185,14 +185,6 @@ showScreen = function showScreenWithOps(name) {
 
 ensureOpsScreens();
 
-setInterval(() => {
-  const statsButton = [...document.querySelectorAll('.bottom-nav button')].find((button) => button.textContent.includes('Ajustes') || button.dataset.go === 'settings');
-  if (statsButton) {
-    statsButton.dataset.go = 'stats';
-    statsButton.innerHTML = '<span class="nav-icon gear"></span>Estadísticas';
-  }
-}, 700);
-
 document.addEventListener('click', async (event) => {
   const addManual = event.target.closest('.add-manual-ingredient');
   if (addManual) {

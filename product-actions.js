@@ -165,6 +165,13 @@ renderHome = function patchedRenderHome() {
     return `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${escapeHtml(dish.name)}</h3><p>${escapeHtml(format.name)}: coste <b>${currency(formatCost(dish, format))}</b> · PVP ${currency(format.pvp)}</p><small>Receta base: ${yieldCount(dish)} tapas</small></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`;
   }).join('');
   renderEscandallosOverview();
+  // Los KPIs del dashboard son accionables (margen / platos activos / alertas).
+  // Se configura aquí en cada render en vez de con un setInterval.
+  document.querySelectorAll('[data-screen="home"] .kpi').forEach((card, index) => {
+    card.tabIndex = 0;
+    card.dataset.action = index === 1 ? 'active-dishes' : index === 2 ? 'alerts' : 'margin';
+  });
+  document.querySelector('.session-chip')?.remove();
 };
 
 renderDetail = function patchedRenderDetail() {
@@ -327,15 +334,6 @@ applyRecommendedPrice = async function patchedApplyRecommendedPrice() {
 ensureProductScreens();
 document.querySelector('.session-chip')?.remove();
 
-setInterval(() => {
-  document.querySelector('.session-chip')?.remove();
-  document.querySelectorAll('[data-screen="home"] .kpi').forEach((card, index) => {
-    card.tabIndex = 0;
-    card.dataset.action = index === 1 ? 'active-dishes' : index === 2 ? 'alerts' : 'margin';
-  });
-  const settingsButton = [...document.querySelectorAll('.bottom-nav button')].find((button) => button.textContent.trim() === 'Ajustes');
-  if (settingsButton) settingsButton.dataset.go = 'settings';
-}, 500);
 
 document.addEventListener('click', async (event) => {
   const escandalloFilter = event.target.closest('[data-escandallo-filter]');
