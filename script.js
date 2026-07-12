@@ -94,8 +94,38 @@ async function initSupabase() {
   }
 }
 
+const LOCAL_STATE_KEY = "escandalia.local.v1";
+
+/** Guarda el estado en el navegador cuando se trabaja sin sesión de Supabase. */
+function saveLocalState() {
+  if (useSupabase) return;
+  try {
+    localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify({ business, ingredients, dishes, selectedDishId }));
+  } catch (error) {
+    /* localStorage puede fallar en modo privado; no bloquea la app. */
+  }
+}
+
+/** Recupera el estado local guardado. Devuelve true si lo aplicó. */
+function loadLocalState() {
+  try {
+    const raw = localStorage.getItem(LOCAL_STATE_KEY);
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (!saved || !Array.isArray(saved.dishes) || !saved.ingredients) return false;
+    business = { ...business, ...saved.business };
+    ingredients = saved.ingredients;
+    dishes = saved.dishes;
+    selectedDishId = dishes.some((dish) => dish.id === saved.selectedDishId) ? saved.selectedDishId : dishes[0]?.id || "";
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 function seedLocalFallback() {
   useSupabase = false;
+  if (loadLocalState()) return;
   const byName = Object.fromEntries(ingredientSeed.map(([name, unit, current, before]) => [name, slugify(name)]));
   ingredients = Object.fromEntries(ingredientSeed.map(([name, unit, current, before]) => [byName[name], { name, unit, current, before }]));
   dishes = dishSeed.map((dish) => ({ ...dish, id: slugify(dish.name), recipe: dish.recipe.map(([name, qty]) => ({ ingredient: byName[name], qty })) }));
@@ -169,12 +199,13 @@ function renderAll() {
   renderPublicMenu();
   if (typeof renderIngredientList === "function") renderIngredientList();
   if (typeof renderIngredientEdit === "function") renderIngredientEdit();
+  saveLocalState();
 }
 
 function showScreen(name) {
   renderAll();
   screens.forEach((screen) => screen.classList.toggle("is-active", screen.dataset.screen === name));
-  const navTarget = { "add-dish": "dish-detail", "edit-recipe": "dish-detail", "ai-price": "dish-detail", "ingredient-edit": "ingredient-list", "ingredient-alert": "ingredient-list", "ingredient-costs": "ingredient-list" }[name] || name;
+  const navTarget = { "add-dish": "dish-detail", "edit-recipe": "dish-detail", "ai-price": "dish-detail", "ingredient-edit": "ingredient-list", "ingredient-alert": "ingredient-list", "ingredient-costs": "ingredient-list", "purchases": "stats" }[name] || name;
   navButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.go === navTarget));
   const publicView = name === "public-menu";
   nav.style.display = publicView ? "none" : "grid";

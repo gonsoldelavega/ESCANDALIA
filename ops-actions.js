@@ -218,13 +218,18 @@ document.addEventListener('click', async (event) => {
     const total = numberFromInput(document.querySelector('.purchase-total')?.value, 0);
     const supplier = document.querySelector('.purchase-supplier')?.value || '';
     if (!name || !qty || !total) return showSync?.('Completa producto, cantidad y total');
+    // Coste por unidad tal cual se compró (para el histórico de compras) y coste
+    // por unidad base (g/ml) para que los escandallos no se disparen al comprar
+    // en formatos grandes como litros o kilos.
     const unitCostValue = total / qty;
-    const id = await createOrReuseIngredient({ name, unit, cost: unitCostValue });
+    const { base: baseUnit, factor } = normalizePurchaseUnit(unit);
+    const baseCost = total / (qty * factor);
+    const id = await createOrReuseIngredient({ name, unit: baseUnit, cost: baseCost });
     if (id && ingredients[id]) {
       ingredients[id].before = ingredients[id].current;
-      ingredients[id].current = unitCostValue;
-      ingredients[id].unit = unit;
-      if (useSupabase && session && supabase) await supabase.from('ingredients').update({ normalized_name: normalizeProductName(ingredients[id].name), previous_cost: ingredients[id].before, current_cost: unitCostValue, unit }).eq('id', id);
+      ingredients[id].current = baseCost;
+      ingredients[id].unit = baseUnit;
+      if (useSupabase && session && supabase) await supabase.from('ingredients').update({ normalized_name: normalizeProductName(ingredients[id].name), previous_cost: ingredients[id].before, current_cost: baseCost, unit: baseUnit }).eq('id', id);
     }
     const purchase = { name: ingredients[id]?.name || name, qty, unit, total, unitCost: unitCostValue, supplier, date: new Date().toISOString() };
     opsState.purchases.unshift(purchase);

@@ -2,7 +2,7 @@ let editingPurchaseIndex = null;
 let editingSaleIndex = null;
 
 function editableDishOptions(selectedId) {
-  return dishes.map((dish) => `<option value="${dish.id}" ${dish.id === selectedId ? 'selected' : ''}>${dish.name}</option>`).join('');
+  return dishes.map((dish) => `<option value="${dish.id}" ${dish.id === selectedId ? 'selected' : ''}>${escapeHtml(dish.name)}</option>`).join('');
 }
 
 async function refreshOps() {
@@ -34,13 +34,13 @@ renderPurchaseList = function renderEditablePurchaseList() {
     if (editingPurchaseIndex === index) {
       return `<article class="ops-edit-card"><label>Producto<input class="edit-purchase-name" value="${item.name}" /></label><div class="split"><label>Cantidad<input class="edit-purchase-qty" value="${item.qty}" inputmode="decimal" /></label><label>Unidad<input class="edit-purchase-unit" value="${item.unit}" /></label></div><div class="split"><label>Total pagado<input class="edit-purchase-total" value="${currency(item.total).replace('€','')}" inputmode="decimal" /></label><label>Proveedor<input class="edit-purchase-supplier" value="${item.supplier || ''}" /></label></div><div class="ops-actions"><button class="primary-button update-purchase" type="button" data-index="${index}">Guardar</button><button class="secondary-button cancel-edit" type="button">Cancelar</button></div></article>`;
     }
-    return `<article class="ops-row"><div><strong>${item.name}</strong><span>${item.qty} ${item.unit} · ${currency(item.unitCost)} por unidad</span></div><b>${currency(item.total)}</b><div class="ops-actions"><button class="secondary-button edit-purchase" type="button" data-index="${index}">Editar</button><button class="danger-button delete-purchase" type="button" data-index="${index}">Borrar</button></div></article>`;
+    return `<article class="ops-row"><div><strong>${escapeHtml(item.name)}</strong><span>${item.qty} ${escapeHtml(item.unit)} · ${currency(item.unitCost)} por unidad</span></div><b>${currency(item.total)}</b><div class="ops-actions"><button class="secondary-button edit-purchase" type="button" data-index="${index}">Editar</button><button class="danger-button delete-purchase" type="button" data-index="${index}">Borrar</button></div></article>`;
   }).join('');
 };
 
 renderStatsScreen = function renderEditableStatsScreen() {
   const dishSelect = document.querySelector('.sale-dish');
-  if (dishSelect) dishSelect.innerHTML = dishes.map((dish) => `<option value="${dish.id}">${dish.name}</option>`).join('');
+  if (dishSelect) dishSelect.innerHTML = dishes.map((dish) => `<option value="${dish.id}">${escapeHtml(dish.name)}</option>`).join('');
   const totalSold = opsState.sales.reduce((sum, item) => sum + item.qty, 0);
   const cash = opsState.cashClosings[0]?.total || 0;
   const best = [...opsState.sales].reduce((acc, item) => {
@@ -49,16 +49,16 @@ renderStatsScreen = function renderEditableStatsScreen() {
   }, {});
   const top = Object.entries(best).sort((a, b) => b[1] - a[1]);
   const statsKpis = document.querySelector('.stats-kpis');
-  if (statsKpis) statsKpis.innerHTML = `<article><strong>${totalSold}</strong><span>unidades vendidas</span></article><article><strong>${currency(cash)}</strong><span>última caja</span></article><article><strong>${top[0]?.[0] || 'Sin datos'}</strong><span>más vendida</span></article>`;
+  if (statsKpis) statsKpis.innerHTML = `<article><strong>${totalSold}</strong><span>unidades vendidas</span></article><article><strong>${currency(cash)}</strong><span>última caja</span></article><article><strong>${escapeHtml(top[0]?.[0] || 'Sin datos')}</strong><span>más vendida</span></article>`;
   const topNode = document.querySelector('.top-sales');
   if (!topNode) return;
   const salesRows = opsState.sales.length ? opsState.sales.slice(0, 20).map((item, index) => {
     if (editingSaleIndex === index) {
       return `<article class="ops-edit-card"><label>Plato<select class="edit-sale-dish">${editableDishOptions(item.dishId)}</select></label><div class="split"><label>Formato<select class="edit-sale-format"><option value="tapa" ${item.format === 'tapa' ? 'selected' : ''}>Tapa</option><option value="media" ${item.format === 'media' ? 'selected' : ''}>Media ración</option><option value="racion" ${item.format === 'racion' ? 'selected' : ''}>Ración</option></select></label><label>Unidades<input class="edit-sale-qty" value="${item.qty}" inputmode="decimal" /></label></div><label>Franja<select class="edit-sale-slot"><option ${item.slot === 'Comida' ? 'selected' : ''}>Comida</option><option ${item.slot === 'Tardeo' ? 'selected' : ''}>Tardeo</option><option ${item.slot === 'Cena' ? 'selected' : ''}>Cena</option></select></label><div class="ops-actions"><button class="primary-button update-sale" type="button" data-index="${index}">Guardar</button><button class="secondary-button cancel-edit" type="button">Cancelar</button></div></article>`;
     }
-    return `<article class="ops-row"><div><strong>${item.dishName}</strong><span>${item.qty} ${item.format} · ${item.slot}</span></div><b>${item.qty}</b><div class="ops-actions"><button class="secondary-button edit-sale" type="button" data-index="${index}">Editar</button><button class="danger-button delete-sale" type="button" data-index="${index}">Borrar</button></div></article>`;
+    return `<article class="ops-row"><div><strong>${escapeHtml(item.dishName)}</strong><span>${item.qty} ${escapeHtml(item.format)} · ${escapeHtml(item.slot)}</span></div><b>${item.qty}</b><div class="ops-actions"><button class="secondary-button edit-sale" type="button" data-index="${index}">Editar</button><button class="danger-button delete-sale" type="button" data-index="${index}">Borrar</button></div></article>`;
   }).join('') : '<div class="empty-note">Registra ventas del día para ver tus tapas más vendidas.</div>';
-  const topRows = top.length ? `<div class="mini-heading">Resumen</div>${top.map(([name, qty]) => `<article class="ops-row compact"><div><strong>${name}</strong><span>${qty} ventas registradas</span></div><b>${qty}</b></article>`).join('')}` : '';
+  const topRows = top.length ? `<div class="mini-heading">Resumen</div>${top.map(([name, qty]) => `<article class="ops-row compact"><div><strong>${escapeHtml(name)}</strong><span>${qty} ventas registradas</span></div><b>${qty}</b></article>`).join('')}` : '';
   topNode.innerHTML = `${topRows}<div class="mini-heading">Últimas ventas</div>${salesRows}`;
 };
 

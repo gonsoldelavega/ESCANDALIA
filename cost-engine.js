@@ -138,3 +138,45 @@ numberFromInput = function numberFromInput(value, fallback = 0) {
 currency = function currency(value) {
   return `${Number(value || 0).toFixed(2).replace('.', ',')}€`;
 };
+
+/** Escapa texto para insertarlo con seguridad dentro de innerHTML. */
+function escapeHtml(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Genera un id a partir de un texto que no colisione con los ya usados. */
+function uniqueId(base, existingIds = []) {
+  const used = new Set(existingIds);
+  let root = slugify(base);
+  if (!root) root = 'item';
+  if (!used.has(root)) return root;
+  let index = 2;
+  while (used.has(`${root}-${index}`)) index += 1;
+  return `${root}-${index}`;
+}
+
+/** Convierte g/ml a su unidad de venta legible (kg/L) para mostrar/editar. */
+function displayScale(unit) {
+  return unit === 'g' || unit === 'ml' ? 1000 : 1;
+}
+
+/**
+ * Normaliza la unidad de una compra a la unidad base con la que se calculan
+ * los escandallos (g/ml) y su factor de conversión. Comprar 5 L a 40€ debe
+ * quedar guardado como 0,008 €/ml, no como 8 €/L (que multiplicaría x1000 el
+ * coste de cada receta que use ese ingrediente).
+ */
+function normalizePurchaseUnit(unit) {
+  const u = String(unit || '').trim().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '');
+  if (['kg', 'kgs', 'kilo', 'kilos', 'kilogramo', 'kilogramos'].includes(u)) return { base: 'g', factor: 1000 };
+  if (['g', 'gr', 'grs', 'gramo', 'gramos'].includes(u)) return { base: 'g', factor: 1 };
+  if (['l', 'lt', 'ltr', 'litro', 'litros'].includes(u)) return { base: 'ml', factor: 1000 };
+  if (['ml', 'mililitro', 'mililitros', 'cc'].includes(u)) return { base: 'ml', factor: 1 };
+  return { base: unit || 'uds', factor: 1 };
+}
