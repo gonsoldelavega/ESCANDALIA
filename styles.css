@@ -340,6 +340,27 @@ button{ cursor:pointer }
 .rentabilidad-grid em{ display:block; margin-top:2px; font-size:11px; color:var(--muted,#8a8378); font-style:normal }
 .rentabilidad-note{ margin-top:12px; font-size:12px; color:var(--muted,#8a8378); line-height:1.4 }
 
+/* ── MENU ENGINEERING ────────────────────────────────────────────── */
+.menu-eng-entry{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; width:100%; margin:16px 0 4px; padding:16px; border-radius:16px; border:0.5px solid var(--border-2,rgba(0,0,0,.08)); background:linear-gradient(135deg,#2b2a27,#3c352f); color:#fff; font-size:16px; font-weight:600; cursor:pointer }
+.menu-eng-entry small{ font-weight:400; font-size:12px; opacity:.8 }
+.menu-banner{ padding:12px 14px; border-radius:12px; background:rgba(212,168,67,.12); border:0.5px solid rgba(212,168,67,.35); color:#9A6200; font-size:13px; line-height:1.4; margin-bottom:16px }
+.menu-matrix{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.menu-quadrant{ padding:12px; border-radius:14px; min-height:120px }
+.menu-quadrant-head{ display:flex; gap:8px; align-items:center }
+.menu-emoji{ font-size:22px }
+.menu-quadrant-head strong{ display:block; font-size:14px }
+.menu-quadrant-head em{ display:block; font-size:11px; font-style:normal; opacity:.75 }
+.menu-quadrant-list{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px }
+.menu-chip{ padding:5px 9px; border-radius:8px; background:rgba(255,255,255,.6); font-size:12px; font-weight:600; cursor:pointer; border:0.5px solid rgba(0,0,0,.08) }
+.menu-quadrant-empty{ opacity:.5; font-size:13px }
+.menu-eng-row{ display:grid; gap:10px; margin-top:10px; padding:14px; border-radius:16px; background:var(--surface-2,#faf6ef); border:0.5px solid var(--border-2,rgba(0,0,0,.08)); cursor:pointer }
+.menu-eng-badge{ display:inline-block; padding:3px 9px; border-radius:999px; font-size:12px; font-weight:600 }
+.menu-eng-row-main h3{ margin:8px 0 4px; font-size:16px }
+.menu-eng-row-main p{ font-size:12px; color:var(--muted,#8a8378); line-height:1.4 }
+.menu-eng-row-metrics{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding-top:6px; border-top:0.5px solid var(--border-2,rgba(0,0,0,.08)) }
+.menu-eng-row-metrics span{ display:block; font-size:11px; color:var(--muted,#8a8378) }
+.menu-eng-row-metrics strong{ display:block; margin-top:2px; font-size:15px }
+
 /* ── ESCANDALLOS ─────────────────────────────────────────────────── */
 .escandallos-panel{ margin-top:28px }
 .overview-copy{ margin:-8px 0 14px; color:var(--text-3); font-size:13px; line-height:1.4 }
