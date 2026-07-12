@@ -1,4 +1,4 @@
-let business = { name: "Bar El Rincón", slug: "barelrincón", ownerInitials: "JM", targetMargin: 0.75, languages: ["ES", "EN", "FR", "DE"] };
+let business = { name: "Bar El Rincón", slug: "barelrincón", ownerInitials: "JM", targetMargin: 0.75, languages: ["ES", "EN", "FR", "DE"], taxRate: 0.10, laborRatePerHour: 0, overheadRate: 0 };
 let ingredients = {};
 let dishes = [];
 let selectedDishId = "";
