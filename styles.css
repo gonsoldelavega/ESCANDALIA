@@ -361,6 +361,41 @@ button{ cursor:pointer }
 .menu-eng-row-metrics span{ display:block; font-size:11px; color:var(--muted,#8a8378) }
 .menu-eng-row-metrics strong{ display:block; margin-top:2px; font-size:15px }
 
+/* ── CENTRO DE AVISOS ────────────────────────────────────────────── */
+.avisos-summary{ display:flex; align-items:center; gap:12px; width:100%; margin:12px 0 4px; padding:14px 16px; border-radius:16px; background:linear-gradient(135deg,#7a2f18,#b5532a); color:#fff; cursor:pointer; border:none; text-align:left }
+.avisos-icon{ font-size:22px }
+.avisos-summary h3{ font-size:15px; margin-bottom:2px }
+.avisos-summary p{ font-size:12px; opacity:.85; line-height:1.35 }
+.alerts-loss-card{ padding:16px; border-radius:16px; background:#FDECEA; border:0.5px solid rgba(192,57,43,.25); margin-bottom:16px }
+.alerts-loss-card span{ display:block; font-size:12px; color:#C0392B }
+.alerts-loss-card strong{ display:block; font-size:28px; font-weight:700; color:#C0392B; margin:4px 0 2px }
+.alerts-loss-card em{ font-size:12px; color:#a05043; font-style:normal }
+.alert-item{ display:flex; align-items:center; gap:12px; margin-top:10px; padding:14px; border-radius:16px; background:var(--surface-2,#faf6ef); border:0.5px solid var(--border-2,rgba(0,0,0,.08)); cursor:pointer }
+.alert-item.sev-high{ border-left:4px solid #C0392B }
+.alert-item.sev-mid{ border-left:4px solid #D4A843 }
+.alert-item.sev-low{ border-left:4px solid #5DC99A }
+.alert-item-icon{ font-size:22px }
+.alert-item-body{ flex:1 }
+.alert-item-top{ display:flex; align-items:center; justify-content:space-between; gap:8px }
+.alert-item-top h3{ font-size:15px }
+.alert-sev{ font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted,#8a8378); white-space:nowrap }
+.alert-item-body p{ font-size:12px; color:var(--muted,#8a8378); line-height:1.4; margin-top:3px }
+.alert-item-arrow{ font-size:20px; color:var(--muted,#8a8378) }
+
+/* ── AJUSTES EDITABLES ───────────────────────────────────────────── */
+.settings-field{ display:block; margin-top:12px; font-size:13px; color:var(--muted,#8a8378) }
+.settings-field input{ width:100%; margin-top:6px; padding:12px 14px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); font-size:16px; color:inherit; background:#fff }
+.settings-url{ display:flex; align-items:center; gap:0; margin-top:6px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); border-radius:12px; overflow:hidden; background:#fff }
+.settings-url span{ padding:12px 4px 12px 14px; font-size:14px; color:var(--muted,#8a8378); white-space:nowrap }
+.settings-url input{ border:none; margin:0; border-radius:0; flex:1 }
+.settings-hint{ margin-top:6px; font-size:11px; color:var(--muted,#8a8378); line-height:1.4 }
+.save-settings{ margin-top:18px }
+
+/* ── ALÉRGENOS EN CHIPS ──────────────────────────────────────────── */
+.menu-allergens{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px }
+.allergen-chip{ padding:3px 9px; border-radius:999px; background:rgba(181,83,42,.1); color:#8a3d1c; font-size:11px; font-weight:600 }
+.qr-box canvas{ display:block; border-radius:8px }
+
 /* ── ESCANDALLOS ─────────────────────────────────────────────────── */
 .escandallos-panel{ margin-top:28px }
 .overview-copy{ margin:-8px 0 14px; color:var(--text-3); font-size:13px; line-height:1.4 }
