@@ -93,11 +93,6 @@ bootData = async function bootDataWithOps() {
 function ensureOpsScreens() {
   const nav = document.querySelector('.bottom-nav');
   if (!nav) return;
-  const settingsButton = [...nav.querySelectorAll('button')].find((button) => button.textContent.trim() === 'Ajustes' || button.dataset.go === 'settings');
-  if (settingsButton) {
-    settingsButton.dataset.go = 'stats';
-    settingsButton.innerHTML = '<span class="nav-icon gear"></span>Estadísticas';
-  }
   if (!document.querySelector('[data-screen="purchases"]')) {
     nav.insertAdjacentHTML('beforebegin', `<section class="app-screen" data-screen="purchases"><header class="hero hero-rust compact-hero"><button class="back" type="button" data-go="home">← Volver</button><h1>Compras</h1><p>Registra lo que compras y a qué precio.</p></header><div class="content"><article class="ops-form"><label>Producto<input class="purchase-name" placeholder="Aceite de oliva" /></label><div class="split"><label>Cantidad<input class="purchase-qty" inputmode="decimal" placeholder="5" /></label><label>Unidad<input class="purchase-unit" placeholder="L, kg, uds" /></label></div><div class="split"><label>Total pagado<input class="purchase-total" inputmode="decimal" placeholder="34,20" /></label><label>Proveedor<input class="purchase-supplier" placeholder="Opcional" /></label></div><button class="primary-button save-purchase" type="button">Guardar compra</button></article><div class="section-title">Últimas compras</div><div class="purchase-list"></div></div></section>`);
   }

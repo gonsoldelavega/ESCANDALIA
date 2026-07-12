@@ -8,7 +8,7 @@
  *   - Navegaciones: cache-first sobre index.html con fallback a red.
  * ========================================================================== */
 
-const CACHE = 'escandalia-v1';
+const CACHE = 'escandalia-v2';
 
 const APP_SHELL = [
   './',
@@ -36,7 +36,10 @@ const APP_SHELL = [
   './settings-editable.js',
   './carta.js',
   './alerts-plus.js',
+  './dish-list.js',
+  './i18n.js',
   './locales-roles.js',
+  './onboarding.js',
 ];
 
 self.addEventListener('install', (event) => {

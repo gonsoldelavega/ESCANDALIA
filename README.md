@@ -23,8 +23,13 @@ Prototipo cloud-first de Escandalia, una app mobile-first para bares, cafetería
 - **Costes y compras:** edición manual, registro de compras con conversión de
   unidades (L/kg → ml/g) y escaneo de facturas por OCR (Google Vision).
 - **Ventas y caja:** registro diario y tapas más vendidas.
+- **Listado de platos:** pantalla buscable con los platos agrupados por
+  categoría, márgenes y estado (borrador/publicado).
 - **Carta pública + QR:** QR real generado en el cliente (sin dependencias),
-  categorías dinámicas y alérgenos en chips.
+  categorías dinámicas, alérgenos en chips y **carta multilingüe** (ES/EN/FR)
+  con traducciones editables por plato.
+- **Onboarding:** panel de bienvenida en el primer arranque para configurar
+  negocio, margen e IVA y crear el primer plato.
 - **Ajustes editables:** negocio, URL, margen objetivo, IVA, personal y gastos.
 - **Multi-local y roles:** varios negocios por dispositivo y roles
   dueño / encargado / cocina con permisos.

@@ -77,9 +77,16 @@ function roundMoney(value) {
   return Math.round((Number(value) || 0) * 100) / 100;
 }
 
-/** Parseo seguro de input monetario (acepta € , → .) */
+/** Parseo seguro de input monetario (acepta €, formato español 1.234,56 y espacios) */
 function numberFromInput(value, fallback = 0) {
-  const parsed = Number(String(value || '').replace('€', '').replace(',', '.'));
+  const normalized = String(value || '')
+    .trim()
+    .replace(/€|â‚¬/g, '')
+    .replace(/\s/g, '');
+  const decimalValue = normalized.includes(',')
+    ? normalized.replace(/\./g, '').replace(',', '.')
+    : normalized;
+  const parsed = Number(decimalValue);
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
@@ -134,22 +141,6 @@ function slugify(value) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
-
-numberFromInput = function numberFromInput(value, fallback = 0) {
-  const normalized = String(value || '')
-    .trim()
-    .replace(/€|â‚¬/g, '')
-    .replace(/\s/g, '');
-  const decimalValue = normalized.includes(',')
-    ? normalized.replace(/\./g, '').replace(',', '.')
-    : normalized;
-  const parsed = Number(decimalValue);
-  return Number.isFinite(parsed) ? parsed : fallback;
-};
-
-currency = function currency(value) {
-  return `${Number(value || 0).toFixed(2).replace('.', ',')}€`;
-};
 
 /** Escapa texto para insertarlo con seguridad dentro de innerHTML. */
 function escapeHtml(value) {
