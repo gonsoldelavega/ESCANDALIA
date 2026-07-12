@@ -419,6 +419,36 @@ body.role-kitchen .delete-purchase,
 body.role-kitchen .delete-sale,
 body.role-kitchen .save-sale{ display:none }
 
+/* ── LISTADO DE PLATOS ───────────────────────────────────────────── */
+.dish-search{ display:block; margin:4px 0 8px }
+.dish-search-input{ width:100%; padding:12px 14px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); font-size:16px; background:#fff }
+.dishes-group{ margin-bottom:18px }
+.dishes-group-title{ font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted,#8a8378); margin:8px 2px }
+.dish-draft{ font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#9A6200; background:rgba(212,168,67,.15); padding:2px 6px; border-radius:6px; vertical-align:middle }
+
+/* ── EDITOR DE TRADUCCIONES ──────────────────────────────────────── */
+.i18n-card{ padding:14px; border-radius:14px; background:var(--surface-2,#faf6ef); border:0.5px solid var(--border-2,rgba(0,0,0,.08)) }
+.i18n-lang{ margin-bottom:12px }
+.i18n-flag{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.05em; color:#fff; background:#2b2a27; padding:2px 8px; border-radius:6px; margin-bottom:6px }
+.i18n-card label{ display:block; font-size:12px; color:var(--muted,#8a8378); margin-top:6px }
+.i18n-card input{ width:100%; margin-top:4px; padding:10px 12px; border-radius:10px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); font-size:15px; background:#fff }
+
+/* ── ONBOARDING ──────────────────────────────────────────────────── */
+.onboarding-overlay{ position:fixed; inset:0; z-index:60; background:rgba(30,27,24,.55); backdrop-filter:blur(4px); display:flex; align-items:flex-end; justify-content:center }
+.onboarding-panel{ width:min(100vw,430px); background:var(--surface,#fff); border-radius:24px 24px 0 0; padding:24px 22px calc(22px + env(safe-area-inset-bottom)); box-shadow:0 -12px 40px rgba(0,0,0,.25); animation:onboardingUp .3s ease }
+@keyframes onboardingUp{ from{ transform:translateY(30px); opacity:.4 } to{ transform:translateY(0); opacity:1 } }
+.onboarding-panel h2{ font-family:Georgia,'DM Serif Display',serif; font-size:26px; margin-bottom:6px }
+.onboarding-panel .ob-sub{ font-size:14px; color:var(--muted,#8a8378); line-height:1.45; margin-bottom:18px }
+.onboarding-panel label{ display:block; font-size:13px; color:var(--muted,#8a8378); margin-top:12px }
+.onboarding-panel input{ width:100%; margin-top:6px; padding:12px 14px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); font-size:16px; background:#fff }
+.ob-split{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.ob-actions{ margin-top:20px; display:flex; flex-direction:column; gap:8px }
+.ob-dots{ display:flex; gap:6px; justify-content:center; margin-top:14px }
+.ob-dot{ width:7px; height:7px; border-radius:50%; background:rgba(0,0,0,.15) }
+.ob-dot.is-active{ background:var(--rust,#b5532a) }
+.ob-skip{ background:none; border:none; color:var(--muted,#8a8378); font-size:13px; cursor:pointer; padding:8px }
+.auth-skip{ display:block; width:100%; margin-top:14px; background:none; border:none; color:var(--muted,#8a8378); font-size:14px; text-decoration:underline; cursor:pointer; padding:10px }
+
 /* ── ESCANDALLOS ─────────────────────────────────────────────────── */
 .escandallos-panel{ margin-top:28px }
 .overview-copy{ margin:-8px 0 14px; color:var(--text-3); font-size:13px; line-height:1.4 }

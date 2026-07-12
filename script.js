@@ -62,7 +62,7 @@ function renderAuthOverlay(message = "") {
   if (!overlay) {
     overlay = document.createElement("div");
     overlay.className = "auth-overlay";
-    overlay.innerHTML = `<section class="auth-panel"><div class="auth-head"><div class="auth-logo">Escan<span>d</span>alia</div><h2>Accede a tu bar</h2><p>Guarda platos, ingredientes y márgenes en la nube.</p></div><div class="auth-body"><label>Email<input class="auth-email" type="email" autocomplete="email" placeholder="tu@email.com" /></label><label>Contraseña<input class="auth-password" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres" /></label><div class="auth-actions"><button class="primary-button auth-login" type="button">Entrar</button><button class="secondary-button auth-signup" type="button">Crear cuenta</button></div><p class="auth-message"></p></div></section>`;
+    overlay.innerHTML = `<section class="auth-panel"><div class="auth-head"><div class="auth-logo">Escan<span>d</span>alia</div><h2>Accede a tu bar</h2><p>Guarda platos, ingredientes y márgenes en la nube.</p></div><div class="auth-body"><label>Email<input class="auth-email" type="email" autocomplete="email" placeholder="tu@email.com" /></label><label>Contraseña<input class="auth-password" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres" /></label><div class="auth-actions"><button class="primary-button auth-login" type="button">Entrar</button><button class="secondary-button auth-signup" type="button">Crear cuenta</button></div><p class="auth-message"></p><button class="auth-skip" type="button">Usar sin cuenta (modo local)</button></div></section>`;
     document.body.appendChild(overlay);
   }
   overlay.querySelector(".auth-message").textContent = message;
@@ -168,8 +168,14 @@ async function loadFromSupabase() {
   selectedDishId = dishes.some((dish) => dish.id === selectedDishId) ? selectedDishId : dishes[0]?.id;
 }
 
+function isLocalModePreferred() {
+  try { return localStorage.getItem("escandalia.skipAuth") === "1"; } catch (error) { return false; }
+}
+
 async function bootData() {
-  if (!useSupabase) { seedLocalFallback(); renderAll(); return; }
+  // Si el usuario eligió "usar sin cuenta", trabajamos en local aunque Supabase
+  // esté configurado (evita quedar bloqueado si el backend está caído/pausado).
+  if (!useSupabase || isLocalModePreferred()) { useSupabase = false; seedLocalFallback(); renderAll(); return; }
   if (!session) { seedLocalFallback(); renderAll(); renderAuthOverlay(); renderSessionChip(); return; }
   hideAuthOverlay();
   renderSessionChip();
@@ -205,7 +211,7 @@ function renderAll() {
 function showScreen(name) {
   renderAll();
   screens.forEach((screen) => screen.classList.toggle("is-active", screen.dataset.screen === name));
-  const navTarget = { "add-dish": "dish-detail", "edit-recipe": "dish-detail", "ai-price": "dish-detail", "ingredient-edit": "ingredient-list", "ingredient-alert": "ingredient-list", "ingredient-costs": "ingredient-list", "purchases": "stats" }[name] || name;
+  const navTarget = { "dish-detail": "dishes", "add-dish": "dishes", "edit-recipe": "dishes", "ai-price": "dishes", "ingredient-edit": "ingredient-list", "ingredient-alert": "ingredient-list", "ingredient-costs": "ingredient-list", "purchases": "stats" }[name] || name;
   navButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.go === navTarget));
   const publicView = name === "public-menu";
   nav.style.display = publicView ? "none" : "grid";
@@ -265,6 +271,15 @@ async function applyRecommendedPrice() {
 }
 
 document.addEventListener("click", async (event) => {
+  if (event.target.closest(".auth-skip")) {
+    try { localStorage.setItem("escandalia.skipAuth", "1"); } catch (error) { /* modo privado */ }
+    useSupabase = false;
+    hideAuthOverlay();
+    seedLocalFallback();
+    renderAll();
+    showSync("Usando Escandalia en este dispositivo. Puedes conectar tu cuenta desde Ajustes.");
+    return;
+  }
   const authButton = event.target.closest(".auth-login,.auth-signup,.logout-button");
   if (authButton) {
     if (authButton.classList.contains("logout-button")) { await supabase.auth.signOut(); return; }

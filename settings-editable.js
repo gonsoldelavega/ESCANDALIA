@@ -63,7 +63,7 @@ function renderSettingsForm() {
     <button class="primary-button save-settings" type="button">Guardar ajustes</button>
     <article class="settings-card settings-account">
       <div><span class="settings-kicker">Cuenta y nube</span><h3>${escapeHtml(cloud)}</h3><p>${escapeHtml(email)}</p></div>
-      ${session?.user ? '<button class="secondary-button logout-button" type="button">Salir</button>' : ''}
+      ${session?.user ? '<button class="secondary-button logout-button" type="button">Salir</button>' : '<button class="secondary-button connect-cloud" type="button">Conectar cuenta en la nube</button>'}
     </article>`;
 }
 
@@ -77,5 +77,14 @@ document.addEventListener('click', async (event) => {
     event.preventDefault();
     event.stopImmediatePropagation();
     await saveBusinessSettings();
+    return;
+  }
+  if (event.target.closest('.connect-cloud')) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    // Salir del modo local: al recargar, la app volverá a intentar la nube.
+    try { localStorage.removeItem('escandalia.skipAuth'); } catch (error) { /* modo privado */ }
+    showSync?.('Conectando con la nube…');
+    setTimeout(() => window.location.reload(), 300);
   }
 }, true);
