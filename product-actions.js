@@ -43,11 +43,15 @@ function activateDynamicScreen(name) {
 function renderCostEditor() {
   const editor = document.querySelector('.cost-editor');
   if (!editor || typeof ingredients === 'undefined') return;
-  editor.innerHTML = Object.entries(ingredients).map(([id, item]) => `<label class="cost-row"><div><strong>${item.name}</strong><span>Antes: ${currency((item.before || item.current) * 1000)}/${item.unit === 'ml' ? 'L' : item.unit}</span></div><input data-ingredient-cost="${id}" value="${currency(item.current * (item.unit === 'ml' ? 1000 : 1)).replace('€','')}" inputmode="decimal" /></label>`).join('');
+  editor.innerHTML = Object.entries(ingredients).map(([id, item]) => {
+    const scale = displayScale(item.unit);
+    const unitLabel = item.unit === 'g' ? 'kg' : item.unit === 'ml' ? 'L' : item.unit;
+    return `<label class="cost-row"><div><strong>${escapeHtml(item.name)}</strong><span>Antes: ${currency((item.before || item.current) * scale)}/${unitLabel}</span></div><input data-ingredient-cost="${id}" value="${currency(item.current * scale).replace('€','')}" inputmode="decimal" /></label>`;
+  }).join('');
 }
 
 function ingredientOptions(selectedId) {
-  return Object.entries(ingredients).map(([id, item]) => `<option value="${id}" ${id === selectedId ? 'selected' : ''}>${item.name}</option>`).join('');
+  return Object.entries(ingredients).map(([id, item]) => `<option value="${id}" ${id === selectedId ? 'selected' : ''}>${escapeHtml(item.name)}</option>`).join('');
 }
 
 function formatRows(dish) {
@@ -135,7 +139,7 @@ function renderEscandallosOverview() {
     const pvp = Number(format.pvp) || 0;
     const foodCost = pvp > 0 ? cost / pvp : 0;
     const badgeClass = marginClass(margin);
-    return `<article class="escandallo-card ${badgeClass}" data-dish-id="${dish.id}"><div class="escandallo-main"><span class="escandallo-kicker">${hasRecipe ? escandalloBadgeLabel(margin) : 'Pendiente de receta'}</span><h3>${dish.name}</h3><p>Coste del plato <b>${hasRecipe ? currency(cost) : 'Sin datos'}</b> · PVP actual <b>${currency(pvp)}</b></p></div><div class="escandallo-metrics"><div><span>Margen estimado</span><strong>${hasRecipe ? percent(margin) : '--'}</strong></div><div><span>Food cost</span><strong>${hasRecipe && pvp > 0 ? percent(foodCost) : '--'}</strong></div></div><div class="escandallo-actions"><button class="secondary-button compact-action" type="button" data-go="dish-detail" data-dish-id="${dish.id}">Ver detalle</button><button class="primary-button compact-action" type="button" data-go="ai-price" data-dish-id="${dish.id}">Revisar precio</button></div></article>`;
+    return `<article class="escandallo-card ${badgeClass}" data-dish-id="${dish.id}"><div class="escandallo-main"><span class="escandallo-kicker">${hasRecipe ? escandalloBadgeLabel(margin) : 'Pendiente de receta'}</span><h3>${escapeHtml(dish.name)}</h3><p>Coste del plato <b>${hasRecipe ? currency(cost) : 'Sin datos'}</b> · PVP actual <b>${currency(pvp)}</b></p></div><div class="escandallo-metrics"><div><span>Margen estimado</span><strong>${hasRecipe ? percent(margin) : '--'}</strong></div><div><span>Food cost</span><strong>${hasRecipe && pvp > 0 ? percent(foodCost) : '--'}</strong></div></div><div class="escandallo-actions"><button class="secondary-button compact-action" type="button" data-go="dish-detail" data-dish-id="${dish.id}">Ver detalle</button><button class="primary-button compact-action" type="button" data-go="ai-price" data-dish-id="${dish.id}">Revisar precio</button></div></article>`;
   }).join('') : '<div class="empty-note">No hay platos en este filtro.</div>'}`;
 }
 
@@ -154,13 +158,20 @@ renderHome = function patchedRenderHome() {
   if (alertsList) {
     alertsList.innerHTML = alerts.length === 0
       ? '<div class="no-alerts"><span class="no-alerts-check">✓</span> Todo en orden · Sin alertas activas</div>'
-      : alerts.map((a) => `<article class="alert-card" role="button" tabindex="0" data-go="ingredient-alert" data-ing-id="${a.ingredientId}"><div class="food-icon olive"></div><div><h2>${a.ingredient.name} +${Math.round(a.rise * 100)}%</h2><p>${a.affected.length} plato${a.affected.length !== 1 ? "s" : ""} por debajo del margen objetivo</p></div></article>`).join('');
+      : alerts.map((a) => `<article class="alert-card" role="button" tabindex="0" data-go="ingredient-alert" data-ing-id="${a.ingredientId}"><div class="food-icon olive"></div><div><h2>${escapeHtml(a.ingredient.name)} +${Math.round(a.rise * 100)}%</h2><p>${a.affected.length} plato${a.affected.length !== 1 ? "s" : ""} por debajo del margen objetivo</p></div></article>`).join('');
   }
   document.querySelector('.dish-list').innerHTML = dishes.map((dish) => {
     const format = primaryFormat(dish);
-    return `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>${format.name}: coste <b>${currency(formatCost(dish, format))}</b> · PVP ${currency(format.pvp)}</p><small>Receta base: ${yieldCount(dish)} tapas</small></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`;
+    return `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${escapeHtml(dish.name)}</h3><p>${escapeHtml(format.name)}: coste <b>${currency(formatCost(dish, format))}</b> · PVP ${currency(format.pvp)}</p><small>Receta base: ${yieldCount(dish)} tapas</small></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`;
   }).join('');
   renderEscandallosOverview();
+  // Los KPIs del dashboard son accionables (margen / platos activos / alertas).
+  // Se configura aquí en cada render en vez de con un setInterval.
+  document.querySelectorAll('[data-screen="home"] .kpi').forEach((card, index) => {
+    card.tabIndex = 0;
+    card.dataset.action = index === 1 ? 'active-dishes' : index === 2 ? 'alerts' : 'margin';
+  });
+  document.querySelector('.session-chip')?.remove();
 };
 
 renderDetail = function patchedRenderDetail() {
@@ -168,18 +179,34 @@ renderDetail = function patchedRenderDetail() {
   const screen = document.querySelector("[data-screen='dish-detail']");
   const format = primaryFormat(dish);
   const margin = formatMargin(dish, format);
-  screen.querySelector('h1').innerHTML = dish.name.replace(' de ', ' de<br />');
+  screen.querySelector('h1').innerHTML = escapeHtml(dish.name).replace(' de ', ' de<br />');
   screen.querySelector('.muted-on-dark').textContent = `Receta base · salen ${yieldCount(dish)} tapas · Actualizado hoy`;
   screen.querySelector('.status-pill strong').textContent = percent(margin);
   screen.querySelector('.status-pill span').textContent = margin >= 0.7 ? `${format.name} · margen saludable` : `${format.name} · revisar precio`;
-  screen.querySelector('.ingredient-list').innerHTML = dish.recipe.length ? dish.recipe.map((line) => `<div><span>${ingredients[line.ingredient]?.name || 'Ingrediente'}</span><em>${line.qty} ${ingredients[line.ingredient]?.unit || ''}</em><b>${currency(ingredientCost(line))}</b></div>`).join('') : `<div class="empty-note">Este plato todavía no tiene receta base.</div>`;
+  screen.querySelector('.ingredient-list').innerHTML = dish.recipe.length ? dish.recipe.map((line) => `<div><span>${escapeHtml(ingredients[line.ingredient]?.name || 'Ingrediente')}</span><em>${line.qty} ${escapeHtml(ingredients[line.ingredient]?.unit || '')}</em><b>${currency(ingredientCost(line))}</b></div>`).join('') : `<div class="empty-note">Este plato todavía no tiene receta base.</div>`;
   screen.querySelector('.total-card span').textContent = 'Coste receta base';
   screen.querySelector('.total-card strong').textContent = currency(baseRecipeCost(dish));
   screen.querySelector('.price-row').innerHTML = `<span>Coste por tapa base</span><strong>${currency(unitCost(dish))}</strong>`;
   screen.querySelector('.format-summary')?.remove();
   screen.querySelector('.price-row').insertAdjacentHTML('afterend', `<div class="format-summary">${defaultFormats(dish).map((item) => `<article><span>${item.name}</span><b>${currency(item.pvp)}</b><em>${currency(formatCost(dish, item))} coste · ${percent(formatMargin(dish, item))}</em></article>`).join('')}</div>`);
   document.querySelector('.sticky-summary').innerHTML = `<span>Coste receta <b>${currency(baseRecipeCost(dish))}</b></span><span>Tapa base <b>${currency(unitCost(dish))}</b></span>`;
+  const publishBtn = screen.querySelector('.publish-toggle');
+  if (publishBtn) {
+    publishBtn.textContent = dish.published ? 'Quitar de la carta' : 'Publicar en la carta';
+    publishBtn.classList.toggle('is-published', Boolean(dish.published));
+  }
 };
+
+async function toggleDishPublished() {
+  const dish = selectedDish?.();
+  if (!dish) return;
+  dish.published = !dish.published;
+  if (useSupabase && session && supabase) {
+    await supabase.from('dishes').update({ published: dish.published }).eq('id', dish.id);
+  }
+  renderAll();
+  showSync?.(dish.published ? 'Plato publicado en la carta' : 'Plato retirado de la carta');
+}
 
 renderAiPrice = function patchedRenderAiPrice() {
   const dish = oilAlert().affected[0]?.dish || selectedDish(); if (!dish) return;
@@ -219,7 +246,7 @@ async function saveIngredientCosts() {
     const item = ingredients[id];
     if (!item) continue;
     const raw = Number(input.value.replace('€', '').replace(',', '.')) || 0;
-    const nextCost = item.unit === 'ml' ? raw / 1000 : raw;
+    const nextCost = raw / displayScale(item.unit);
     item.before = item.current;
     item.current = nextCost;
     if (typeof useSupabase !== 'undefined' && useSupabase && session && supabase) {
@@ -285,7 +312,7 @@ createDishFromForm = async function createBlankDishFromForm() {
     selectedDishId = data.id;
     await loadFromSupabase();
   } else {
-    const id = slugify(name);
+    const id = uniqueId(name, dishes.map((dish) => dish.id));
     dishes.push({ id, name, category, servings, pvp, icon: 'olive-thumb', published: false, description: '', allergens: 'Pendiente de revisar', recipe: [], formats: defaultFormats({ pvp }) });
     selectedDishId = id;
   }
@@ -307,15 +334,6 @@ applyRecommendedPrice = async function patchedApplyRecommendedPrice() {
 ensureProductScreens();
 document.querySelector('.session-chip')?.remove();
 
-setInterval(() => {
-  document.querySelector('.session-chip')?.remove();
-  document.querySelectorAll('[data-screen="home"] .kpi').forEach((card, index) => {
-    card.tabIndex = 0;
-    card.dataset.action = index === 1 ? 'active-dishes' : index === 2 ? 'alerts' : 'margin';
-  });
-  const settingsButton = [...document.querySelectorAll('.bottom-nav button')].find((button) => button.textContent.trim() === 'Ajustes');
-  if (settingsButton) settingsButton.dataset.go = 'settings';
-}, 500);
 
 document.addEventListener('click', async (event) => {
   const escandalloFilter = event.target.closest('[data-escandallo-filter]');
@@ -325,6 +343,7 @@ document.addEventListener('click', async (event) => {
     renderEscandallosOverview();
     return;
   }
+  if (event.target.closest('[data-action="toggle-publish"]')) { event.preventDefault(); event.stopImmediatePropagation(); await toggleDishPublished(); return; }
   const kpi = event.target.closest('.kpi');
   if (kpi?.dataset.action === 'alerts') { event.preventDefault(); showScreen('ingredient-alert'); return; }
   if (kpi?.dataset.action === 'active-dishes') { event.preventDefault(); showScreen('home'); setTimeout(() => document.querySelector('.dish-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); return; }

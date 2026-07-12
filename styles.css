@@ -317,6 +317,107 @@ button{ cursor:pointer }
 .mid-bg{   color:#9A6200; background:rgba(212,168,67,.1);  border:0.5px solid rgba(212,168,67,.35) }
 .low-bg{   color:#C0392B; background:#FDECEA; border:0.5px solid rgba(192,57,43,.2) }
 .good-text{ color:#1A8048 }
+.mid-text{ color:#9A6200 }
+.low-text{ color:#C0392B }
+
+/* ── RENTABILIDAD REAL ───────────────────────────────────────────── */
+.merma-card{ margin-top:14px; padding:14px; border-radius:14px; background:var(--surface-2,#faf6ef); border:0.5px solid var(--border-2,rgba(0,0,0,.08)) }
+.merma-head strong{ display:block; font-size:15px }
+.merma-head span{ display:block; margin-top:2px; font-size:12px; color:var(--muted,#8a8378); line-height:1.35 }
+.merma-options{ display:flex; flex-wrap:wrap; gap:6px; margin-top:12px }
+.merma-chip{ padding:7px 12px; border-radius:999px; border:0.5px solid rgba(0,0,0,.14); background:#fff; font-size:13px; font-weight:600; cursor:pointer }
+.merma-chip.is-active{ background:var(--rust,#B5532A); color:#fff; border-color:transparent }
+.merma-effect{ margin-top:10px; font-size:12px; color:var(--muted,#8a8378) }
+.labor-row{ display:grid; grid-template-columns:1fr 84px; gap:10px; align-items:center; padding:12px 4px }
+.labor-row strong{ font-size:14px }
+.labor-row span{ display:block; font-size:12px; color:var(--muted,#8a8378); line-height:1.35 }
+.labor-row input{ text-align:right }
+.rentabilidad-panel{ margin-top:22px }
+.rentabilidad-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.rentabilidad-grid article{ padding:12px; border-radius:14px; background:var(--surface-2,#faf6ef); border:0.5px solid var(--border-2,rgba(0,0,0,.08)) }
+.rentabilidad-grid span{ display:block; font-size:12px; color:var(--muted,#8a8378) }
+.rentabilidad-grid strong{ display:block; margin-top:4px; font-size:22px; font-weight:700 }
+.rentabilidad-grid em{ display:block; margin-top:2px; font-size:11px; color:var(--muted,#8a8378); font-style:normal }
+.rentabilidad-note{ margin-top:12px; font-size:12px; color:var(--muted,#8a8378); line-height:1.4 }
+
+/* ── MENU ENGINEERING ────────────────────────────────────────────── */
+.menu-eng-entry{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; width:100%; margin:16px 0 4px; padding:16px; border-radius:16px; border:0.5px solid var(--border-2,rgba(0,0,0,.08)); background:linear-gradient(135deg,#2b2a27,#3c352f); color:#fff; font-size:16px; font-weight:600; cursor:pointer }
+.menu-eng-entry small{ font-weight:400; font-size:12px; opacity:.8 }
+.menu-banner{ padding:12px 14px; border-radius:12px; background:rgba(212,168,67,.12); border:0.5px solid rgba(212,168,67,.35); color:#9A6200; font-size:13px; line-height:1.4; margin-bottom:16px }
+.menu-matrix{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.menu-quadrant{ padding:12px; border-radius:14px; min-height:120px }
+.menu-quadrant-head{ display:flex; gap:8px; align-items:center }
+.menu-emoji{ font-size:22px }
+.menu-quadrant-head strong{ display:block; font-size:14px }
+.menu-quadrant-head em{ display:block; font-size:11px; font-style:normal; opacity:.75 }
+.menu-quadrant-list{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px }
+.menu-chip{ padding:5px 9px; border-radius:8px; background:rgba(255,255,255,.6); font-size:12px; font-weight:600; cursor:pointer; border:0.5px solid rgba(0,0,0,.08) }
+.menu-quadrant-empty{ opacity:.5; font-size:13px }
+.menu-eng-row{ display:grid; gap:10px; margin-top:10px; padding:14px; border-radius:16px; background:var(--surface-2,#faf6ef); border:0.5px solid var(--border-2,rgba(0,0,0,.08)); cursor:pointer }
+.menu-eng-badge{ display:inline-block; padding:3px 9px; border-radius:999px; font-size:12px; font-weight:600 }
+.menu-eng-row-main h3{ margin:8px 0 4px; font-size:16px }
+.menu-eng-row-main p{ font-size:12px; color:var(--muted,#8a8378); line-height:1.4 }
+.menu-eng-row-metrics{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding-top:6px; border-top:0.5px solid var(--border-2,rgba(0,0,0,.08)) }
+.menu-eng-row-metrics span{ display:block; font-size:11px; color:var(--muted,#8a8378) }
+.menu-eng-row-metrics strong{ display:block; margin-top:2px; font-size:15px }
+
+/* ── CENTRO DE AVISOS ────────────────────────────────────────────── */
+.avisos-summary{ display:flex; align-items:center; gap:12px; width:100%; margin:12px 0 4px; padding:14px 16px; border-radius:16px; background:linear-gradient(135deg,#7a2f18,#b5532a); color:#fff; cursor:pointer; border:none; text-align:left }
+.avisos-icon{ font-size:22px }
+.avisos-summary h3{ font-size:15px; margin-bottom:2px }
+.avisos-summary p{ font-size:12px; opacity:.85; line-height:1.35 }
+.alerts-loss-card{ padding:16px; border-radius:16px; background:#FDECEA; border:0.5px solid rgba(192,57,43,.25); margin-bottom:16px }
+.alerts-loss-card span{ display:block; font-size:12px; color:#C0392B }
+.alerts-loss-card strong{ display:block; font-size:28px; font-weight:700; color:#C0392B; margin:4px 0 2px }
+.alerts-loss-card em{ font-size:12px; color:#a05043; font-style:normal }
+.alert-item{ display:flex; align-items:center; gap:12px; margin-top:10px; padding:14px; border-radius:16px; background:var(--surface-2,#faf6ef); border:0.5px solid var(--border-2,rgba(0,0,0,.08)); cursor:pointer }
+.alert-item.sev-high{ border-left:4px solid #C0392B }
+.alert-item.sev-mid{ border-left:4px solid #D4A843 }
+.alert-item.sev-low{ border-left:4px solid #5DC99A }
+.alert-item-icon{ font-size:22px }
+.alert-item-body{ flex:1 }
+.alert-item-top{ display:flex; align-items:center; justify-content:space-between; gap:8px }
+.alert-item-top h3{ font-size:15px }
+.alert-sev{ font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted,#8a8378); white-space:nowrap }
+.alert-item-body p{ font-size:12px; color:var(--muted,#8a8378); line-height:1.4; margin-top:3px }
+.alert-item-arrow{ font-size:20px; color:var(--muted,#8a8378) }
+
+/* ── AJUSTES EDITABLES ───────────────────────────────────────────── */
+.settings-field{ display:block; margin-top:12px; font-size:13px; color:var(--muted,#8a8378) }
+.settings-field input{ width:100%; margin-top:6px; padding:12px 14px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); font-size:16px; color:inherit; background:#fff }
+.settings-url{ display:flex; align-items:center; gap:0; margin-top:6px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); border-radius:12px; overflow:hidden; background:#fff }
+.settings-url span{ padding:12px 4px 12px 14px; font-size:14px; color:var(--muted,#8a8378); white-space:nowrap }
+.settings-url input{ border:none; margin:0; border-radius:0; flex:1 }
+.settings-hint{ margin-top:6px; font-size:11px; color:var(--muted,#8a8378); line-height:1.4 }
+.save-settings{ margin-top:18px }
+
+/* ── ALÉRGENOS EN CHIPS ──────────────────────────────────────────── */
+.menu-allergens{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px }
+.allergen-chip{ padding:3px 9px; border-radius:999px; background:rgba(181,83,42,.1); color:#8a3d1c; font-size:11px; font-weight:600 }
+.qr-box canvas{ display:block; border-radius:8px }
+
+/* ── LOCALES Y ROLES ─────────────────────────────────────────────── */
+.role-options{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap }
+.role-chip{ flex:1; min-width:88px; padding:10px 8px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.14)); background:#fff; font-size:13px; font-weight:600; cursor:pointer }
+.role-chip.is-active{ background:#2b2a27; color:#fff; border-color:transparent }
+.locales-list{ margin-top:10px; display:flex; flex-direction:column; gap:8px }
+.locale-row{ display:flex; align-items:center; gap:8px }
+.locale-switch{ flex:1; text-align:left; padding:12px 14px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); background:#fff; font-size:15px; font-weight:600; cursor:pointer }
+.locale-row.is-active .locale-switch{ border-color:var(--rust,#b5532a); color:var(--rust,#b5532a) }
+.locale-delete{ padding:8px 12px; font-size:16px; line-height:1; border-radius:12px }
+.locale-new{ display:flex; gap:8px; margin-top:10px }
+.locale-new input{ flex:1; padding:12px 14px; border-radius:12px; border:0.5px solid var(--border-2,rgba(0,0,0,.12)); font-size:15px; background:#fff }
+.locale-new .create-locale{ white-space:nowrap }
+
+/* Ocultación de acciones según rol */
+body.role-manager .save-settings{ display:none }
+body.role-kitchen .save-settings,
+body.role-kitchen .publish-toggle,
+body.role-kitchen [data-action="apply-recommended-price"],
+body.role-kitchen [data-action="edit-price-manually"],
+body.role-kitchen .delete-purchase,
+body.role-kitchen .delete-sale,
+body.role-kitchen .save-sale{ display:none }
 
 /* ── ESCANDALLOS ─────────────────────────────────────────────────── */
 .escandallos-panel{ margin-top:28px }
@@ -704,7 +805,7 @@ input:focus{
 /* ── BOTTOM NAV ──────────────────────────────────────────────────── */
 .bottom-nav{
   position:fixed; left:50%; bottom:0; z-index:10;
-  display:grid; grid-template-columns:repeat(3,1fr);
+  display:grid; grid-template-columns:repeat(4,1fr);
   width:min(100vw,430px);
   padding:8px 8px 14px;
   border-top:0.5px solid var(--border-2);

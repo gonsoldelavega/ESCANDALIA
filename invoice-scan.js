@@ -52,7 +52,9 @@ async function handleInvoiceFile(file) {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ image: dataUrl, ingredients: ingredientCatalogForScan() }),
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => {
+      throw new Error("El escaneo de facturas no está disponible ahora mismo. Puedes editar los costes a mano.");
+    });
     if (!res.ok) throw new Error(data.error || "No se pudo leer la factura.");
     invoiceLines = (data.lines || []).map((line, index) => ({
       ...line,

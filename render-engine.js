@@ -32,18 +32,18 @@ function renderHome() {
   const alertBody = document.querySelector(".alert-card p");
   if (alertBody) alertBody.textContent = `${alert.affected.length} platos han bajado su margen por debajo del 65%`;
   const dishList = document.querySelector(".dish-list");
-  if (dishList) dishList.innerHTML = dishes.map((dish) => `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${dish.name}</h3><p>Coste: <b>${currency(dishCost(dish))}</b> · PVP: ${currency(dish.pvp)}</p></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`).join("");
+  if (dishList) dishList.innerHTML = dishes.map((dish) => `<article class="dish-card" data-go="dish-detail" data-dish-id="${dish.id}" role="button" tabindex="0"><div class="dish-thumb ${dish.icon}"></div><div class="dish-info"><h3>${escapeHtml(dish.name)}</h3><p>Coste: <b>${currency(dishCost(dish))}</b> · PVP: ${currency(dish.pvp)}</p></div><span class="margin-badge ${marginClass(dishMargin(dish))}">${percent(dishMargin(dish))}</span></article>`).join("");
 }
 
 function renderDetail() {
   const dish = selectedDish(); if (!dish) return;
   const screen = document.querySelector("[data-screen='dish-detail']");
   const margin = dishMargin(dish);
-  screen.querySelector("h1").innerHTML = dish.name.replace(" de ", " de<br />");
+  screen.querySelector("h1").innerHTML = escapeHtml(dish.name).replace(" de ", " de<br />");
   screen.querySelector(".muted-on-dark").textContent = `${dish.servings} ración${dish.servings > 1 ? "es" : ""} · Actualizado hoy`;
   screen.querySelector(".status-pill strong").textContent = percent(margin);
   screen.querySelector(".status-pill span").textContent = margin >= 0.7 ? "margen bruto ✓ Saludable" : "margen bruto · Revisar";
-  screen.querySelector(".ingredient-list").innerHTML = dish.recipe.map((line) => `<div><span>${ingredients[line.ingredient]?.name || "Ingrediente"}</span><em>${line.qty} ${ingredients[line.ingredient]?.unit || ""}</em><b>${currency(ingredientCost(line))}</b></div>`).join("");
+  screen.querySelector(".ingredient-list").innerHTML = dish.recipe.map((line) => `<div><span>${escapeHtml(ingredients[line.ingredient]?.name || "Ingrediente")}</span><em>${line.qty} ${escapeHtml(ingredients[line.ingredient]?.unit || "")}</em><b>${currency(ingredientCost(line))}</b></div>`).join("");
   screen.querySelector(".total-card strong").textContent = currency(dishCost(dish));
   screen.querySelector(".price-row strong").textContent = currency(dish.pvp);
   document.querySelector(".edit-list").innerHTML = screen.querySelector(".ingredient-list").innerHTML;
@@ -80,7 +80,7 @@ function renderIngredientAlert() {
   screen.querySelector("h1").textContent = `${ing.name} +${Math.round(alert.rise * 100)}%`;
   screen.querySelector(".impact-grid").innerHTML = `<div><span>Antes</span><b>${ingDisplayPrice({ ...ing, current: ing.before })}</b></div><div><span>Ahora</span><b>${ingDisplayPrice(ing)}</b></div><div><span>Impacto</span><b>${alert.affected.length} plato${alert.affected.length !== 1 ? "s" : ""}</b></div>`;
   screen.querySelectorAll(".affected-card").forEach((node) => node.remove());
-  screen.querySelector(".section-title").insertAdjacentHTML("afterend", alert.affected.map((item) => `<article class="affected-card"><h3>${item.dish.name}</h3><p>Antes ${percent(item.before)} · Ahora <b>${percent(item.current)}</b></p><strong>PVP sugerido: ${currency(item.suggested)}</strong></article>`).join(""));
+  screen.querySelector(".section-title").insertAdjacentHTML("afterend", alert.affected.map((item) => `<article class="affected-card"><h3>${escapeHtml(item.dish.name)}</h3><p>Antes ${percent(item.before)} · Ahora <b>${percent(item.current)}</b></p><strong>PVP sugerido: ${currency(item.suggested)}</strong></article>`).join(""));
 }
 
 function renderIngredientList() {
@@ -99,7 +99,7 @@ function renderIngredientList() {
     const rise = ing.before > 0 ? (ing.current - ing.before) / ing.before : 0;
     const isAlert = alertedIds.has(id);
     const changeBadge = Math.abs(rise) > 0.001 ? `<span class="ing-change ${rise > 0 ? "ing-up" : "ing-down"}">${rise > 0 ? "+" : ""}${Math.round(rise * 100)}%</span>` : "";
-    return `<article class="ing-row${isAlert ? " ing-alert" : ""}" data-go="ingredient-edit" data-ing-id="${id}" role="button" tabindex="0"><div class="ing-info"><h3>${ing.name}</h3><p>${ingDisplayPrice(ing)}</p></div><div class="ing-right">${changeBadge}<span class="ing-arrow">›</span></div></article>`;
+    return `<article class="ing-row${isAlert ? " ing-alert" : ""}" data-go="ingredient-edit" data-ing-id="${id}" role="button" tabindex="0"><div class="ing-info"><h3>${escapeHtml(ing.name)}</h3><p>${ingDisplayPrice(ing)}</p></div><div class="ing-right">${changeBadge}<span class="ing-arrow">›</span></div></article>`;
   }).join("");
 }
 
@@ -122,7 +122,7 @@ function renderIngredientEdit() {
   if (!preview) return;
   const alerts = typeof getCostAlerts === "function" ? getCostAlerts() : [];
   const myAlert = alerts.find((a) => a.ingredientId === id);
-  preview.innerHTML = myAlert?.affected.length ? `<div class="section-title" style="margin-top:24px">Platos afectados</div>${myAlert.affected.map((item) => `<article class="affected-card"><h3>${item.dish.name}</h3><p>Margen actual: <b>${percent(item.current)}</b></p><strong>PVP sugerido: ${currency(item.suggested)}</strong></article>`).join("")}` : "";
+  preview.innerHTML = myAlert?.affected.length ? `<div class="section-title" style="margin-top:24px">Platos afectados</div>${myAlert.affected.map((item) => `<article class="affected-card"><h3>${escapeHtml(item.dish.name)}</h3><p>Margen actual: <b>${percent(item.current)}</b></p><strong>PVP sugerido: ${currency(item.suggested)}</strong></article>`).join("")}` : "";
 }
 
 function renderAiPrice() {
@@ -137,5 +137,5 @@ function renderAiPrice() {
 
 function renderPublicMenu() {
   document.querySelector(".public-header h1").textContent = business.name;
-  document.querySelector("[data-screen='public-menu'] .content").innerHTML = `<div class="category-tabs"><button class="is-selected">Tapas</button><button>Bocadillos</button><button>Bebidas</button></div>${dishes.filter((dish) => dish.published).map((dish) => `<article class="menu-item"><div><h3>${dish.name}</h3><p>${dish.description || "Descripción pendiente."}</p><span>${dish.allergens}</span></div><strong>${currency(dish.pvp)}</strong></article>`).join("")}`;
+  document.querySelector("[data-screen='public-menu'] .content").innerHTML = `<div class="category-tabs"><button class="is-selected">Tapas</button><button>Bocadillos</button><button>Bebidas</button></div>${dishes.filter((dish) => dish.published).map((dish) => `<article class="menu-item"><div><h3>${escapeHtml(dish.name)}</h3><p>${escapeHtml(dish.description || "Descripción pendiente.")}</p><span>${escapeHtml(dish.allergens)}</span></div><strong>${currency(dish.pvp)}</strong></article>`).join("")}`;
 }

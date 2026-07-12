@@ -1,0 +1,22 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Ejecutar tests de lógica y estructura
+        run: |
+          node tests/cost-engine.test.js
+          node tests/rentabilidad.test.js
+          node tests/qr.test.js
+          node tests/sprint3-functional-smoke.test.js
